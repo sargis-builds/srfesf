@@ -242,6 +242,13 @@ body {
   pointer-events: auto;
   touch-action: none;
   display: none;
+  background: transparent;
+  /* ⚠️ ԱՅՍ ՏՈՂԵՐԸ ԱՎԵԼԱՑՐՈՒ */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Ցույց տալ mobile սարքերում */
@@ -2607,6 +2614,98 @@ document.addEventListener('touchend', (e) => {
   lastTouchEnd = now;
 }, false);
 
+/* ============================================================
+   TOUCH CAMERA LOOK
+   ============================================================ */
+
+const touchLookZone = document.getElementById('touchLookZone');
+
+let lookTouchId = null;
+let lookLastX = 0;
+let lookLastY = 0;
+const LOOK_SENSITIVITY = 0.005;
+const LOOK_MIN = -Math.PI / 3;
+const LOOK_MAX = Math.PI / 3;
+
+function handleLookStart(e) {
+  if (!touchLookZone) return;
+  if (lookTouchId !== null) return;
+  e.preventDefault();
+  const touch = e.changedTouches[0];
+  lookTouchId = touch.identifier;
+  lookLastX = touch.clientX;
+  lookLastY = touch.clientY;
+}
+
+function handleLookMove(e) {
+  if (lookTouchId === null) return;
+  e.preventDefault();
+
+  let touch = null;
+  for (const t of e.changedTouches) {
+    if (t.identifier === lookTouchId) {
+      touch = t;
+      break;
+    }
+  }
+  if (!touch) return;
+
+  const dx = touch.clientX - lookLastX;
+  const dy = touch.clientY - lookLastY;
+
+  lookLastX = touch.clientX;
+  lookLastY = touch.clientY;
+
+  cameraYawOffset -= dx * LOOK_SENSITIVITY;
+  cameraYawOffset = Math.max(LOOK_MIN, Math.min(LOOK_MAX, cameraYawOffset));
+}
+
+function handleLookEnd(e) {
+  if (lookTouchId === null) return;
+  for (const t of e.changedTouches) {
+    if (t.identifier === lookTouchId) {
+      lookTouchId = null;
+      break;
+    }
+  }
+}
+
+if (touchLookZone) {
+  touchLookZone.addEventListener('touchstart', handleLookStart, { passive: false });
+  touchLookZone.addEventListener('touchmove', handleLookMove, { passive: false });
+  touchLookZone.addEventListener('touchend', handleLookEnd, { passive: false });
+  touchLookZone.addEventListener('touchcancel', handleLookEnd, { passive: false });
+}
+
+// ========== DESKTOP — MOUSE LOOK ==========
+let mouseLookActive = false;
+
+window.addEventListener('mousedown', (e) => {
+  if (e.button === 2) {
+    mouseLookActive = true;
+    lookLastX = e.clientX;
+    lookLastY = e.clientY;
+    e.preventDefault();
+  }
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!mouseLookActive) return;
+  const dx = e.clientX - lookLastX;
+  lookLastX = e.clientX;
+  cameraYawOffset -= dx * LOOK_SENSITIVITY;
+  cameraYawOffset = Math.max(LOOK_MIN, Math.min(LOOK_MAX, cameraYawOffset));
+});
+
+window.addEventListener('mouseup', (e) => {
+  if (e.button === 2) {
+    mouseLookActive = false;
+  }
+});
+
+window.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+});
 /* ============================================================
    ՎԵՐՋ 🎉
    ============================================================ */

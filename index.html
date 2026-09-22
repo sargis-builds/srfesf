@@ -1,953 +1,2810 @@
 <!DOCTYPE html>
 <html lang="hy">
 <head>
-    <meta charset="UTF-8">
-    <title>Epica: Campaign Conquest</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f0f1e">
+<title>Երևանյան Առաքիչ</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #0f0f1e;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    color: #fff; user-select: none;
+  }
+  #game { width: 100vw; height: 100vh; display: block; }
 
-        html, body {
-            background: #020408;
-            color: #f8fafc;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
+  .hud { position: fixed; pointer-events: none; z-index: 10; }
 
-        .screen {
-            display: none;
-            width: 100vw;
-            height: 100vh;
-            position: absolute;
-            top: 0;
-            left: 0;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
+  #topBar {
+    top: 16px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.6);
+    padding: 12px 26px; border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.12);
+    display: flex; gap: 28px;
+    font-size: 15px; font-weight: 600;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  #topBar .item { display: flex; align-items: center; gap: 8px; }
+  #topBar .label { color: #888; font-weight: 400; }
+  #topBar .value { color: #ffd166; font-weight: 800; font-size: 17px; }
 
-        .active-screen {
-            display: flex;
-        }
+  #mission {
+    top: 84px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    padding: 14px 32px; border-radius: 32px;
+    font-size: 17px; font-weight: 700;
+    box-shadow: 0 10px 30px rgba(79,172,254,0.5);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-align: center; letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  #mission.deliver {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    box-shadow: 0 10px 30px rgba(245,87,108,0.5);
+  }
 
-        .box-container {
-            background: rgba(8, 12, 20, 0.95);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(217, 119, 6, 0.5);
-            border-radius: 20px;
-            width: 90%;
-            max-width: 800px;
-            padding: 35px;
-            text-align: center;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.95);
-        }
+  #speedo {
+    bottom: 28px; right: 28px;
+    background: rgba(0,0,0,0.65);
+    padding: 16px 26px; border-radius: 18px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.12);
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  #speedo .num {
+    font-size: 38px; font-weight: 900;
+    color: #ffd166; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  #speedo .unit {
+    font-size: 11px; color: #888;
+    letter-spacing: 3px; margin-top: 4px;
+  }
 
-        .box-container h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 32px;
-            margin-top: 0;
-            color: #fbbf24;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 15px rgba(245,158,11,0.4);
-        }
-
-        .rules-list {
-            text-align: left;
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(217, 119, 6, 0.3);
-            border-radius: 12px;
-            padding: 20px 25px;
-            margin: 20px 0;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #cbd5e1;
-        }
-
-        .rules-list li {
-            margin-bottom: 12px;
-        }
-
-        .highlight-danger {
-            color: #ef4444;
-            font-weight: 600;
-        }
-
-        .levels-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            margin: 25px 0;
-        }
-
-        .level-card {
-            background: rgba(15, 23, 42, 0.9);
-            border: 2px solid rgba(217, 119, 6, 0.3);
-            border-radius: 14px;
-            padding: 20px 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .level-card:hover:not(.locked) {
-            border-color: #fbbf24;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
-        }
-
-        .level-card.locked {
-            opacity: 0.4;
-            border-color: #334155;
-            cursor: not-allowed;
-        }
-
-        .level-title {
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            font-size: 20px;
-            color: #fbbf24;
-        }
-
-        .level-subtitle {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-top: 4px;
-        }
-
-        .battle-arena-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            background: #020408;
-            overflow: hidden;
-        }
-
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        button {
-            background: linear-gradient(180deg, #d97706, #b45309);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 24px;
-            cursor: pointer;
-            border-radius: 10px;
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            font-size: 15px;
-            box-shadow: 0 4px 0 #78350f, 0 8px 20px rgba(0,0,0,0.5);
-        }
-
-        button:disabled {
-            background: #1e293b;
-            border-color: rgba(255, 255, 255, 0.05);
-            color: #475569;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .shop-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin: 25px 0;
-        }
-
-        .shop-item-card {
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(217, 119, 6, 0.3);
-            padding: 15px;
-            border-radius: 14px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        #hud-left-panel {
-            position: absolute;
-            bottom: 25px;
-            left: 30px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            z-index: 10;
-        }
-
-        .ground-weapons-tray {
-            display: flex;
-            gap: 10px;
-            background: rgba(8, 12, 20, 0.88);
-            backdrop-filter: blur(15px);
-            padding: 14px;
-            border-radius: 16px;
-            border: 1px solid rgba(217, 119, 6, 0.4);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-        }
-
-        .ground-weapon-card {
-            background: linear-gradient(180deg, #1e293b, #0f172a);
-            border: 1px solid rgba(217, 119, 6, 0.4);
-            color: #fbbf24;
-            padding: 10px 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            text-align: center;
-            min-width: 90px;
-        }
-
-        .ground-weapon-card:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        /* ⚡ Super Ability Button Styling */
-        #super-ability-btn {
-            background: linear-gradient(180deg, #2563eb, #1d4ed8);
-            border: 2px solid #60a5fa;
-            box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
-            height: 100%;
-            padding: 15px 20px;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-
-        #turn-indicator {
-            position: absolute;
-            top: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(10, 14, 23, 0.9);
-            backdrop-filter: blur(15px);
-            padding: 12px 30px;
-            border-radius: 30px;
-            border: 1px solid rgba(217, 119, 6, 0.4);
-            font-family: 'Cinzel', serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: #fbbf24;
-            z-index: 10;
-        }
-
-        #enemy-weapons-panel {
-            position: absolute;
-            top: 25px;
-            right: 30px;
-            background: rgba(10, 14, 23, 0.85);
-            backdrop-filter: blur(10px);
-            padding: 10px 18px;
-            border-radius: 14px;
-            border: 1px solid rgba(220, 38, 38, 0.4);
-            color: #fca5a5;
-            font-size: 12px;
-            z-index: 10;
-        }
-
-        #game-over-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(3, 5, 8, 0.88);
-            backdrop-filter: blur(15px);
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
-        #tutorial-overlay {
-    display: none; 
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100vw; 
-    height: 100vh; 
-    background: rgba(0,0,0,0.85); 
-    backdrop-filter: blur(8px); 
-    z-index: 200; 
-    align-items: center; 
-    justify-content: center; 
-    flex-direction: column;
+  #minimap {
+  top: 16px; right: 16px;
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.65);
+  border: 3px solid rgba(255,255,255,0.15);
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  z-index: 12;
 }
 
-        .game-over-box {
-            background: rgba(10, 14, 23, 0.95);
-            border: 2px solid rgba(217, 119, 6, 0.6);
-            padding: 50px 70px;
-            border-radius: 24px;
-            text-align: center;
-        }
-    </style>
+@media (max-width: 600px) {
+  #minimap {
+    width: 110px; height: 110px;
+    top: 12px; right: 12px;
+  }
+}
+  #minimap canvas { width: 100%; height: 100%; display: block; }
+
+  #controls {
+    top: 16px; left: 16px;
+    background: rgba(0,0,0,0.55);
+    padding: 12px 18px; border-radius: 14px;
+    font-size: 12px; color: #aaa;
+    line-height: 1.8;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  #controls b { color: #ffd166; font-weight: 700; }
+
+  #toast {
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: rgba(0,0,0,0.9);
+    padding: 24px 48px; border-radius: 24px;
+    font-size: 28px; font-weight: 900;
+    color: #ffd166;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 3px solid #ffd166;
+    box-shadow: 0 20px 60px rgba(255,209,102,0.4);
+    pointer-events: none;
+  }
+  #toast.show { transform: translate(-50%, -50%) scale(1); }
+
+  /* ⚠️ ՆՈՐ — direction arrow */
+  #directionArrow {
+    position: fixed;
+    top: 50%; left: 50%;
+    font-size: 48px;
+    color: #ffd166;
+    text-shadow: 0 0 20px rgba(255,209,102,0.8);
+    pointer-events: none;
+    z-index: 9;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-weight: 900;
+    will-change: transform;
+  }
+
+  /* ⚠️ ՆՈՐ — FPS counter (DEBUG-ի համար) */
+  #fpsCounter {
+    position: fixed;
+    top: 16px; right: 16px;
+    background: rgba(0,0,0,0.6);
+    color: #0f0;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    z-index: 20;
+    pointer-events: none;
+    display: none;
+  }
+  #fpsCounter.show { display: block; }
+
+  #startScreen {
+    position: fixed; inset: 0;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 100; transition: opacity 0.6s;
+  }
+  #startScreen.hide { opacity: 0; pointer-events: none; }
+  #startScreen h1 {
+    font-size: 56px; font-weight: 900;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #ffd166, #ff6b35);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+  }
+  #startScreen p {
+    color: #888; font-size: 18px;
+    margin-bottom: 40px;
+  }
+  #startBtn {
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    border: none; color: #fff;
+    font-size: 20px; font-weight: 800;
+    padding: 18px 60px; border-radius: 40px;
+    cursor: pointer;
+    box-shadow: 0 12px 40px rgba(255,107,53,0.5);
+    transition: transform 0.2s;
+    font-family: inherit;
+  }
+  #startBtn:hover { transform: scale(1.05); }
+  #startBtn:active { transform: scale(0.98); }
+
+/* ============================================================
+   MOBILE JOYSTICK + TOUCH CAMERA
+   ============================================================ */
+
+/* ⚠️ Թաքցնում ենք ամեն ինչ, բացի խաղից */
+body {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+#game {
+  touch-action: none;
+}
+
+/* Joystick — ձախ ներքև */
+#joystickZone {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  width: 140px;
+  height: 140px;
+  z-index: 15;
+  pointer-events: auto;
+  touch-action: none;
+  display: none;
+}
+
+#joystickBase {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  position: relative;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+#joystickKnob {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 60px; height: 60px;
+  margin-left: -30px;
+  margin-top: -30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffd166, #ff6b35);
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.6);
+  transition: transform 0.05s;
+  will-change: transform;
+}
+
+/* ⚠️ Touch area — ամբողջ էկրանը, բացի joystick-ից */
+#touchLookZone {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  pointer-events: auto;
+  touch-action: none;
+  display: none;
+}
+
+/* Ցույց տալ mobile սարքերում */
+@media (hover: none) and (pointer: coarse) {
+  #joystickZone { display: block; }
+  #touchLookZone { display: block; }
+  #controls { display: none; }
+}
+
+/* Desktop-ի համար joystick-ը թաքցնում ենք */
+@media (hover: hover) and (pointer: fine) {
+  #joystickZone { display: none; }
+  #touchLookZone { display: none; }
+}
+
+/* Mobile-ում HUD-ը փոքրացնում ենք */
+@media (max-width: 600px) {
+  #topBar {
+    font-size: 12px;
+    padding: 8px 16px;
+    gap: 16px;
+  }
+  #topBar .value { font-size: 14px; }
+
+  #mission {
+    font-size: 13px;
+    padding: 10px 20px;
+    top: 64px;
+  }
+
+  #speedo {
+    bottom: 20px; right: 20px;
+    padding: 10px 16px;
+  }
+  #speedo .num { font-size: 24px; }
+  #speedo .unit { font-size: 9px; }
+
+  #directionArrow {
+    font-size: 36px;
+  }
+}
+</style>
 </head>
 <body>
 
-    <!-- 0. ԽԱՂԻ ԿԱՆՈՆՆԵՐԻ ԷԿՐԱՆ -->
-    <div id="screen-rules" class="screen active-screen">
-        <div class="box-container">
-            <h2>📜 ԽԱՂԻ ԿԱՆՈՆՆԵՐԸ</h2>
-            <div class="rules-list">
-                <ul>
-                    <li>⚔️ <b>Հերթափոխով Մարտ:</b> Ընտրեք զենքը ձեր արսենալից՝ հակառակորդին հարվածելու համար:</li>
-                    <li>💰 <b>Արսենալ և Ոսկի:</b> Ամեն մակարդակ մտնելիս ստանում եք ոսկի: Խանութում կարող եք գնել ավելի հզոր զենքեր:</li>
-                    <li>⚠️ <span class="highlight-danger">ՀԱԿԱԴԱՐՁ ՎՆԱՍ (OVERKILL):</span> Եթե ձեր հասցրած վնասը գերազանցում է հակառակորդի մնացած HP-ն, <b>արտահոսած վնասը հետ է հարվածում ՁԵԶ</b>:</li>
-                    <li>⚡ <b>ԳԵՐՀԱՐՎԱԾ (3-րդ մակարդակից):</b> 3-րդ մակարդակից սկսած բացվում է Էներգետիկ Կայծակ կոճակը, որը լիցքավորվում է քայլերի ընթացքում և հասցնում հզոր վնաս:</li>
-                </ul>
-            </div>
-            <button onclick="showScreen('screen-levels')" style="font-size: 17px; padding: 12px 40px;">Հասկացա ➔</button>
-        </div>
-    </div>
+<canvas id="game"></canvas>
 
-    <!-- 1. ՄԱԿԱՐԴԱԿՆԵՐԻ ԸՆՏՐՈՒԹՅԱՆ ԷԿՐԱՆ -->
-    <div id="screen-levels" class="screen">
-        <div class="box-container">
-            <h2>ԸՆՏՐԵՔ ՄԱԿԱՐԴԱԿԸ</h2>
-            <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Հաղթեք յուրաքանչյուր մարտում՝ հաջորդ փուլը բացելու համար</p>
-            <div class="levels-grid" id="levels-container"></div>
-            <button onclick="showScreen('screen-rules')" style="background: #334155; font-size: 13px;">📖 Կանոններ</button>
-        </div>
-    </div>
+<div id="startScreen">
+  <h1>🛵 Երևանյան Առաքիչ</h1>
+  <p>Սամակատով առաքիր պատվերները Երևանի փողոցներով</p>
+  <button id="startBtn">ՍԿՍԵԼ ԽԱՂԸ</button>
+</div>
 
-    <!-- 2. ԽԱՆՈՒԹԻ ԷԿՐԱՆ -->
-    <div id="screen-shop" class="screen">
-        <div class="box-container">
-            <h2 id="shop-level-title">ՄԱԿԱՐԴԱԿ 1: ԱՐՍԵՆԱԼ</h2>
-            <p style="color: #fbbf24; font-size: 18px; font-weight: 600;">Հասանելի Ոսկի: <span id="player-gold">50</span> 🪙</p>
-            <div class="shop-grid" id="shop-items-container"></div>
-            <div style="display:flex; gap:15px; justify-content:center;">
-                <button onclick="showScreen('screen-levels')" style="background: #475569;">⬅️ Մակարդակներ</button>
-                <button onclick="startBattle()" style="font-size: 17px; padding: 12px 40px;">⚔️ Մարտի</button>
-            </div>
-        </div>
-    </div>
+<div class="hud" id="topBar">
+  <div class="item"><span class="label">💰</span><span class="value" id="score">0</span></div>
+  <div class="item"><span class="label">📦</span><span class="value" id="delivered">0</span></div>
+  <div class="item"><span class="label">⏱️</span><span class="value" id="timer">0:00</span></div>
+</div>
 
-    <!-- 3. ՄԱՐՏԻ ԷԿՐԱՆ -->
-    <div id="screen-battle" class="screen">
-        <div class="battle-arena-container">
-            <div id="turn-indicator">✨ Ձեր հերթն է</div>
+<div class="hud" id="mission">📍 Գնա՛ պատվերի կետ</div>
 
-            <div id="enemy-weapons-panel">
-                <div style="font-weight: 700; margin-bottom: 4px; color: #ef4444;">🎯 Հակառակորդի Արսենալը:</div>
-                <div id="enemy-weapons-list"></div>
-            </div>
+<div class="hud" id="controls">
+  <b>W</b> / <b>↑</b> — արագացնել<br>
+  <b>S</b> / <b>↓</b> — արգելակ<br>
+  <b>A</b> / <b>←</b> — ձախ<br>
+  <b>D</b> / <b>→</b> — աջ<br>
+  <b>Space</b> — ձեռքի արգելակ
+</div>
 
-            <div id="game-over-overlay">
-                <div class="game-over-box">
-                    <h2 id="overlay-title" style="color: #fbbf24; font-size: 32px; margin-bottom: 20px; font-family: 'Cinzel', serif;"></h2>
-                    <div style="display: flex; gap: 15px; justify-content: center;">
-                        <button onclick="showScreen('screen-levels')">📜 Մակարդակներ</button>
-                        <button id="retry-level-btn" onclick="retryLevel()" style="background: linear-gradient(180deg, #d97706, #b45309); display: none;">🔄 Կրկին Փորձել</button>
-                        <button id="next-level-btn" onclick="nextLevel()" style="background: linear-gradient(180deg, #16a34a, #15803d); display: none;">⏩ Հաջորդ Մակարդակը</button>
-                    </div>
-                </div>
-            </div>
+<div class="hud" id="speedo">
+  <div class="num" id="speedNum">0</div>
+  <div class="unit">KM/H</div>
+</div>
 
+<div class="hud" id="minimap">
+  <canvas id="minimapCanvas" width="200" height="200"></canvas>
+</div>
 
-            <div id="tutorial-overlay" style="display: flex; position: absolute; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; flex-direction: column;">
-                <div style="background: rgba(15, 23, 42, 0.95); border: 2px solid #60a5fa; padding: 30px 40px; border-radius: 20px; text-align: center; max-width: 450px; box-shadow: 0 0 30px rgba(37,99,235,0.5);">
-                    <h3 style="color: #60a5fa; font-family: 'Cinzel', serif; font-size: 24px; margin-top: 0;">⚡ ԳԵՐՀԱՐՎԱԾԻ ԱԿՏԻՎԱՑՈՒՄ</h3>
-                    <p style="color: #e2e8f0; font-size: 15px; line-height: 1.6; margin: 15px 0;">
-                        Օգտագործիր այս սուպեր էֆեկտը, եթե կարծում ես, որ թշնամին անհաղթելի է։
-                    </p>
-                    <div style="font-size: 35px; margin: 10px 0;">⬇️</div>
-                    <button onclick="closeTutorial()" style="background: linear-gradient(180deg, #2563eb, #1d4ed8); border: 1px solid #60a5fa; padding: 10px 30px; font-size: 15px;">Հասկացա ➔</button>
-                </div>
-            </div>
+<div class="hud" id="toast">+10 💰</div>
+<div id="directionArrow">⬆</div>
+<!-- ⬇️ MOBILE CONTROLS ⬇️ -->
+<div id="joystickZone">
+  <div id="joystickBase">
+    <div id="joystickKnob"></div>
+  </div>
+</div>
 
-            <canvas id="battleCanvas" width="1920" height="700"></canvas>
+<div id="touchLookZone"></div>
+<div id="fpsCounter">FPS: 0</div>
 
-            <div id="hud-left-panel">
-                <div class="ground-weapons-tray" id="ground-weapons-tray"></div>
-                <!-- ⚡ SUPER ABILITY BUTTON -->
-                <button id="super-ability-btn" onclick="useSuperAbility()" style="display:none;">
-                    ⚡ ԷՆԵՐԳԵՏԻԿ ԿԱՅԾԱԿ
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const levelConfigs = [
-            {
-                level: 1, name: "Սկսնակ Դաշտ", unlocked: true,
-                startGold: 60,
-                enemyHp: 35, enemyWeapons: [{ id: "fist", name: "Բռունցք", damage: 5, infinite: true }, { id: "rock", name: "Քար", damage: 8 }],
-                aiType: "random", bgColors: ["#020408", "#1e1b4b", "#065f46", "#022c22"]
-            },
-            {
-                level: 2, name: "Մայրամուտի Ամրոց", unlocked: true,
-                startGold: 90,
-                enemyHp: 55, enemyWeapons: [{ id: "fist", name: "Բռունցք", damage: 6, infinite: true }, { id: "rock", name: "Քար", damage: 10 }, { id: "sword", name: "Սուր", damage: 15 }],
-                aiType: "random", bgColors: ["#2e1065", "#7c2d12", "#78350f", "#451a03"]
-            },
-            {
-                level: 3, name: "Լուսնյակ Գիշեր", unlocked: true,
-                startGold: 130,
-                enemyHp: 80, enemyWeapons: [{ id: "fist", name: "Բռունցք", damage: 8, infinite: true }, { id: "sword", name: "Սուր", damage: 16 }, { id: "axe", name: "Կացին", damage: 22 }],
-                aiType: "smart", bgColors: ["#090d16", "#0f172a", "#1e293b", "#0f172a"]
-            },
-            {
-                level: 4, name: "Անեծքի Գոտի", unlocked: true,
-                startGold: 170,
-                enemyHp: 110, enemyWeapons: [{ id: "fist", name: "Բռունցք", damage: 10, infinite: true }, { id: "sword", name: "Սուր", damage: 20 }, { id: "axe", name: "Կացին", damage: 28 }],
-                aiType: "smart", bgColors: ["#450a0a", "#78350f", "#365314", "#1a2e05"]
-            },
-            {
-                level: 5, name: "Dark Lord-ի Գահը", unlocked: true,
-                startGold: 220,
-                enemyHp: 150, enemyWeapons: [{ id: "fist", name: "Բռունցք", damage: 12, infinite: true }, { id: "sword", name: "Էլիտար Սուր", damage: 25 }, { id: "axe", name: "Տիտան Կացին", damage: 35 }],
-                aiType: "smart", bgColors: ["#000000", "#581c87", "#312e81", "#1e1b4b"]
-            }
-        ];
-
-        let currentLevelIdx = 0;
-        let currentTurn = 0;
-        let gameOver = false;
-
-        // ⚡ SUPER ABILITY VARIABLES
-        let superCooldownMax = 3; 
-        let superCooldownCurrent = 3; 
-        let flashEffectTimer = 0;
-
-        let tutorialShownLevel3 = false;
-
-function closeTutorial() {
-    tutorialShowLevel3 = true
-    document.getElementById("tutorial-overlay").style.display = "none";
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
 }
 
-        let players = [
-            { id: 0, name: "Էպիկական Հերոս", hp: 100, maxHp: 100, gold: 50, weapons: [], castleX: 250, squashX: 1, squashY: 1, hitPopups: [] },
-            { id: 1, name: "Թշնամի", hp: 100, maxHp: 100, weapons: [], castleX: 1670, squashX: 1, squashY: 1, hitPopups: [] }
-        ];
+/* ============================================================
+   MOBILE JOYSTICK + TOUCH CAMERA LOOK
+   ============================================================ */
 
-        let shopWeapons = [
-            { id: "fist", name: "Բռունցք", price: 0, damage: 5, infinite: true },
-            { id: "rock", name: "Էպիկական Քար", price: 15, damage: 9 },
-            { id: "sword", name: "Ասպետական Սուր", price: 30, damage: 15 },
-            { id: "axe", name: "Մարտական Կացին", price: 50, damage: 24 }
-        ];
+// ========== JOYSTICK ==========
+const joystickZone = document.getElementById('joystickZone');
+const joystickBase = document.getElementById('joystickBase');
+const joystickKnob = document.getElementById('joystickKnob');
 
-        let loadedWeapon = null;
-        let catapultAnim = { pulling: 0, releaseKick: 0 };
-        let flyingProjectile = null;
-        let particles = [];
+let joystickActive = false;
+let joystickTouchId = null;
+let joystickCenterX = 0;
+let joystickCenterY = 0;
+const JOYSTICK_RADIUS = 50;
+const DEAD_ZONE = 0.20;
 
-        const canvas = document.getElementById("battleCanvas");
-        const ctx = canvas.getContext("2d");
-
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-            document.getElementById(screenId).classList.add('active-screen');
-            if(screenId === 'screen-levels') renderLevelsUI();
-            if(screenId === 'screen-shop') updateShopUI();
-            if(screenId === 'screen-battle') requestAnimationFrame(gameLoop);
-        }
-
-        function renderLevelsUI() {
-            let container = document.getElementById("levels-container");
-            container.innerHTML = "";
-            levelConfigs.forEach((lvl, idx) => {
-                let card = document.createElement("div");
-                card.className = `level-card ${lvl.unlocked ? '' : 'locked'}`;
-                card.innerHTML = `
-                    <div class="level-title">${lvl.level}</div>
-                    <div style="font-weight:600; font-size:13px; color:#e2e8f0; margin-top:4px;">${lvl.name}</div>
-                    <div class="level-subtitle">${lvl.unlocked ? '🔓 Բացված' : '🔒 Փակ է'}</div>
-                `;
-                if(lvl.unlocked) {
-                    card.onclick = () => selectLevel(idx);
-                }
-                container.appendChild(card);
-            });
-        }
-
-        function selectLevel(idx) {
-            currentLevelIdx = idx;
-            let config = levelConfigs[idx];
-
-            players[0].hp = 100;
-            players[0].maxHp = 100;
-            players[0].gold = config.startGold;
-            players[0].weapons = [{ ...shopWeapons[0] }];
-
-            players[1].name = `Թշնամի (Lvl ${config.level})`;
-            players[1].hp = config.enemyHp;
-            players[1].maxHp = config.enemyHp;
-            players[1].weapons = JSON.parse(JSON.stringify(config.enemyWeapons));
-
-            // Super Ability-ն մշտապես լիցքավորված է սկզբում
-            superCooldownCurrent = superCooldownMax;
-
-            document.getElementById("shop-level-title").innerText = `ՄԱԿԱՐԴԱԿ ${config.level}: ${config.name}`;
-            showScreen('screen-shop');
-        }
-
-        function updateShopUI() {
-            document.getElementById("player-gold").innerText = players[0].gold;
-            let container = document.getElementById("shop-items-container");
-            container.innerHTML = "";
-
-            shopWeapons.forEach(w => {
-                let card = document.createElement("div");
-                card.className = "shop-item-card";
-                let isOwned = w.infinite ? "Անսահման" : `${w.price} 🪙`;
-                card.innerHTML = `
-                    <div>
-                        <div style="font-family:'Cinzel',serif; font-weight:700; color:#fbbf24; font-size:15px; margin-bottom:6px;">${w.name}</div>
-                        <div style="color:#94a3b8; font-size:12px; margin-bottom:10px;">⚔️ Վնաս: ${w.damage}</div>
-                    </div>
-                    <div>
-                        <div style="color:#f59e0b; font-weight:600; font-size:13px; margin-bottom:8px;">${isOwned}</div>
-                        <button onclick="buyWeapon('${w.id}')" style="width:100%; padding:6px; font-size:12px;" ${w.price > players[0].gold || w.infinite ? 'disabled' : ''}>Գնել</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function buyWeapon(wId) {
-            let item = shopWeapons.find(x => x.id === wId);
-            if (item.infinite) return;
-            if (players[0].gold >= item.price) {
-                players[0].gold -= item.price;
-                players[0].weapons.push({ ...item });
-                updateShopUI();
-            }
-        }
-
-        function startBattle() {
-            gameOver = false;
-            currentTurn = 0;
-            showScreen('screen-battle');
-            updateHUD();
-        }
-
-        function selectWeaponFromGround(index) {
-            if (currentTurn !== 0 || flyingProjectile || gameOver) return;
-            let p = players[0];
-            if (p.weapons[index]) {
-                if (loadedWeapon && !loadedWeapon.infinite) p.weapons.push(loadedWeapon);
-                
-                let selected = p.weapons[index];
-                if (selected.infinite) {
-                    loadedWeapon = { ...selected };
-                } else {
-                    loadedWeapon = p.weapons.splice(index, 1)[0];
-                }
-                
-                catapultAnim.pulling = 1;
-                setTimeout(() => {
-                    fireCatapultAnimation();
-                }, 250);
-                updateHUD();
-            }
-        }
-
-        function fireCatapultAnimation() {
-            if (!loadedWeapon || flyingProjectile) return;
-            catapultAnim.pulling = 0;
-            catapultAnim.releaseKick = 1;
-
-            let weapon = loadedWeapon;
-            loadedWeapon = null;
-            launchProjectile(players[0], players[1], weapon);
-            updateHUD();
-        }
-
-        function launchProjectile(shooter, target, weapon) {
-    flyingProjectile = {
-        startX: shooter.castleX + (shooter.id === 0 ? 110 : -110), 
-        startY: 440,
-        targetX: target.castleX + (shooter.id === 0 ? -50 : 50), 
-        targetY: 450,
-        type: weapon.id,
-        damage: weapon.damage,
-        shooter: shooter,
-        target: target,
-        progress: 0,
-        speed: 0.04 // 👈 Սովորական զենքերի արագ կրակոց
-    };
+function getJoystickCenter() {
+  if (!joystickBase) return;
+  const rect = joystickBase.getBoundingClientRect();
+  joystickCenterX = rect.left + rect.width / 2;
+  joystickCenterY = rect.top + rect.height / 2;
 }
 
-        function useSuperAbility() {
-    if (currentLevelIdx < 2) return;
-    if (superCooldownCurrent < superCooldownMax) return;
-    if (currentTurn !== 0 || flyingProjectile || gameOver) return;
+function handleJoystickStart(e) {
+  if (joystickActive || !joystickBase) return;
+  const touch = e.changedTouches[0];
+  joystickTouchId = touch.identifier;
+  joystickActive = true;
+  getJoystickCenter();
+  handleJoystickMove(e);
+}
 
-    superCooldownCurrent = 0;
+function handleJoystickMove(e) {
+  if (!joystickActive) return;
+  let touch = null;
+  for (const t of e.changedTouches) {
+    if (t.identifier === joystickTouchId) {
+      touch = t;
+      break;
+    }
+  }
+  if (!touch) return;
 
-    // ⚡ ԷՖԵԿՏԻ ՏԵՎՈՂՈՒԹՅՈՒՆԸ ԱՌԱՆՁԻՆ Է (Կապ չունի launchProjectile-ի հետ)
-    // 14 = կարճ/արագ կայծակ, 60 = 1 վայրկյան տևողությամբ դանդաղ էֆեկտ
-    flashEffectTimer = 14; 
+  let dx = touch.clientX - joystickCenterX;
+  let dy = touch.clientY - joystickCenterY;
 
-    let superDamage = 35;
-    let enemy = players[1];
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist > JOYSTICK_RADIUS) {
+    dx = (dx / dist) * JOYSTICK_RADIUS;
+    dy = (dy / dist) * JOYSTICK_RADIUS;
+  }
 
-    if (superDamage > enemy.hp) {
-        let excess = superDamage - enemy.hp;
-        enemy.hp = 0;
-        players[0].hp = Math.max(0, players[0].hp - excess);
+  if (joystickKnob) {
+    joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+  }
+
+  const nx = dx / JOYSTICK_RADIUS;
+  const ny = dy / JOYSTICK_RADIUS;
+
+  if (nx < -DEAD_ZONE) {
+    keys['KeyA'] = true; keys['KeyD'] = false;
+  } else if (nx > DEAD_ZONE) {
+    keys['KeyD'] = true; keys['KeyA'] = false;
+  } else {
+    keys['KeyA'] = false; keys['KeyD'] = false;
+  }
+
+  if (ny < -DEAD_ZONE) {
+    keys['KeyW'] = true; keys['KeyS'] = false;
+  } else if (ny > DEAD_ZONE) {
+    keys['KeyS'] = true; keys['KeyW'] = false;
+  } else {
+    keys['KeyW'] = false; keys['KeyS'] = false;
+  }
+}
+
+function handleJoystickEnd(e) {
+  if (!joystickActive) return;
+  let found = false;
+  for (const t of e.changedTouches) {
+    if (t.identifier === joystickTouchId) {
+      found = true; break;
+    }
+  }
+  if (!found) return;
+
+  joystickActive = false;
+  joystickTouchId = null;
+
+  if (joystickKnob) {
+    joystickKnob.style.transform = 'translate(0px, 0px)';
+  }
+
+  keys['KeyA'] = false;
+  keys['KeyD'] = false;
+  keys['KeyW'] = false;
+  keys['KeyS'] = false;
+}
+
+if (joystickZone) {
+  joystickZone.addEventListener('touchstart', handleJoystickStart, { passive: false });
+  joystickZone.addEventListener('touchmove', handleJoystickMove, { passive: false });
+  joystickZone.addEventListener('touchend', handleJoystickEnd, { passive: false });
+  joystickZone.addEventListener('touchcancel', handleJoystickEnd, { passive: false });
+}
+
+// ========== TOUCH CAMERA LOOK ==========
+const touchLookZone = document.getElementById('touchLookZone');
+
+let cameraYawOffset = 0;          // ⚠️ ՆՈՐ — camera-ի լրացուցիչ պտույտ
+let lookTouchId = null;
+let lookLastX = 0;
+let lookLastY = 0;
+const LOOK_SENSITIVITY = 0.005;   // ⚠️ Զգայունություն
+const LOOK_MIN = -Math.PI / 3;    // -60°
+const LOOK_MAX = Math.PI / 3;     // +60°
+
+function handleLookStart(e) {
+  if (!touchLookZone) return;
+  if (lookTouchId !== null) return;
+  const touch = e.changedTouches[0];
+  lookTouchId = touch.identifier;
+  lookLastX = touch.clientX;
+  lookLastY = touch.clientY;
+}
+
+function handleLookMove(e) {
+  if (lookTouchId === null) return;
+  let touch = null;
+  for (const t of e.changedTouches) {
+    if (t.identifier === lookTouchId) {
+      touch = t; break;
+    }
+  }
+  if (!touch) return;
+
+  const dx = touch.clientX - lookLastX;
+  const dy = touch.clientY - lookLastY;
+
+  lookLastX = touch.clientX;
+  lookLastY = touch.clientY;
+
+  // ⚠️ Փոխում ենք camera-ի yaw-ը
+  cameraYawOffset -= dx * LOOK_SENSITIVITY;
+  cameraYawOffset = Math.max(LOOK_MIN, Math.min(LOOK_MAX, cameraYawOffset));
+}
+
+function handleLookEnd(e) {
+  if (lookTouchId === null) return;
+  for (const t of e.changedTouches) {
+    if (t.identifier === lookTouchId) {
+      lookTouchId = null;
+      break;
+    }
+  }
+}
+
+if (touchLookZone) {
+  touchLookZone.addEventListener('touchstart', handleLookStart, { passive: false });
+  touchLookZone.addEventListener('touchmove', handleLookMove, { passive: false });
+  touchLookZone.addEventListener('touchend', handleLookEnd, { passive: false });
+  touchLookZone.addEventListener('touchcancel', handleLookEnd, { passive: false });
+}
+
+// ========== DESKTOP — MOUSE LOOK ==========
+// ⚠️ Եթե desktop-ում ուզում ես մկնիկի աջ կոճակով պտտել camera-ը
+let mouseLookActive = false;
+
+window.addEventListener('mousedown', (e) => {
+  if (e.button === 2) {  // աջ կոճակ
+    mouseLookActive = true;
+    lookLastX = e.clientX;
+    lookLastY = e.clientY;
+    e.preventDefault();
+  }
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!mouseLookActive) return;
+  const dx = e.clientX - lookLastX;
+  lookLastX = e.clientX;
+  cameraYawOffset -= dx * LOOK_SENSITIVITY;
+  cameraYawOffset = Math.max(LOOK_MIN, Math.min(LOOK_MAX, cameraYawOffset));
+});
+
+window.addEventListener('mouseup', (e) => {
+  if (e.button === 2) {
+    mouseLookActive = false;
+  }
+});
+
+window.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+});
+</script>
+
+<script type="module">
+
+import * as THREE from 'three';
+
+// ⚠️ DEBUG flag — FPS և console.log-երի համար
+const DEBUG = false;
+
+// === ՄԱՍ 2-ը կցվում է այստեղից ===
+
+// === ՄԱՍ 2 — THREE.JS SETUP + LIGHTS + GROUND ===
+
+// ========== RENDERER ==========
+const canvas = document.getElementById('game');
+
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  antialias: true,
+  powerPreference: 'high-performance'
+});
+
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+// ========== SCENE ==========
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+scene.fog = new THREE.Fog(0x87ceeb, 100, 240);
+
+// ========== CAMERA (2.5D Isometric) ==========
+const camera = new THREE.PerspectiveCamera(
+  35,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  600
+);
+
+// Isometric offset — տեսախցիկը միշտ խաղացողից այս հեռավորության վրա
+const CAM_OFFSET = new THREE.Vector3(34, 42, 34);
+const CAM_LOOK_OFFSET = new THREE.Vector3(0, 0, -4);
+
+// Սկզբնական դիրք
+camera.position.copy(CAM_OFFSET);
+camera.lookAt(0, 0, 0);
+
+const CAM_DISTANCE = 13;
+const CAM_HEIGHT = 11;
+const CAM_LOOK_AHEAD = 7;
+const CAM_SMOOTH_POS = 6.0;
+const CAM_SMOOTH_LOOK = 8.0;
+const SUN_OFFSET = new THREE.Vector3(60, 90, 40);
+
+// ========== LIGHTS ==========
+// Ambient / hemisphere — ընդհանուր լույս
+const hemi = new THREE.HemisphereLight(0xffffff, 0x6688aa, 0.9);
+scene.add(hemi);
+
+// Արև — ուղղորդված լույս ստվերներով
+const sun = new THREE.DirectionalLight(0xfff2cc, 1.3);
+sun.position.set(60, 90, 40);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = -140;
+sun.shadow.camera.right = 140;
+sun.shadow.camera.top = 140;
+sun.shadow.camera.bottom = -140;
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 300;
+sun.shadow.bias = -0.0005;
+sun.shadow.normalBias = 0.02;
+scene.add(sun);
+
+// Արևի թիրախը (կթարմացվի խաղացողի հետ)
+const sunTarget = new THREE.Object3D();
+scene.add(sunTarget);
+sun.target = sunTarget;
+
+// ========== GROUND ==========
+const groundGeo = new THREE.PlaneGeometry(600, 600);
+const groundMat = new THREE.MeshStandardMaterial({
+  color: 0x6ab04c,
+  roughness: 1,
+  metalness: 0
+});
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// ========== DECORATIVE GRASS PATCHES ==========
+// Փոքր կանաչ բծեր՝ գետնին բազմազանություն տալու համար
+const grassMat = new THREE.MeshStandardMaterial({
+  color: 0x7bc95f,
+  roughness: 1
+});
+for (let i = 0; i < 60; i++) {
+  const patch = new THREE.Mesh(
+    new THREE.CircleGeometry(1 + Math.random() * 2, 8),
+    grassMat
+  );
+  patch.rotation.x = -Math.PI / 2;
+  patch.position.set(
+    (Math.random() - 0.5) * 300,
+    0.01,
+    (Math.random() - 0.5) * 300
+  );
+  scene.add(patch);
+}
+
+// ========== RESIZE HANDLER ==========
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+/* ============================================================
+   ՄԱՍ 3 — STREETS + SIDEWALKS + ROAD MARKINGS
+   Մայթերը ԿՏՐՎԱԾ են խաչմերուկներում
+   ============================================================ */
+
+// ========== STREET NETWORK ==========
+const STREETS = [
+  { x1: -100, x2: 100, z1: -7,  z2: 7,   width: 14, type: 'avenue' },
+  { x1: -100, x2: 100, z1: -41, z2: -31, width: 10, type: 'main' },
+  { x1: -100, x2: 100, z1: -75, z2: -68, width: 7,  type: 'small' },
+  { x1: -100, x2: 100, z1: 31,  z2: 41,  width: 10, type: 'main' },
+  { x1: -100, x2: 100, z1: 68,  z2: 75,  width: 7,  type: 'small' },
+
+  { z1: -100, z2: 100, x1: -7,  x2: 7,   width: 14, type: 'avenue' },
+  { z1: -100, z2: 100, x1: -41, x2: -31, width: 10, type: 'main' },
+  { z1: -100, z2: 100, x1: -75, x2: -68, width: 7,  type: 'small' },
+  { z1: -100, z2: 100, x1: 31,  x2: 41,  width: 10, type: 'main' },
+  { z1: -100, z2: 100, x1: 68,  x2: 75,  width: 7,  type: 'small' },
+];
+
+// ========== MATERIALS ==========
+const streetMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.95 });
+const avenueMat = new THREE.MeshStandardMaterial({ color: 0x353535, roughness: 0.9 });
+const sidewalkMat = new THREE.MeshStandardMaterial({ color: 0xb8b8b8, roughness: 0.9 });
+const curbMat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.85 });
+const dashMat = new THREE.MeshStandardMaterial({
+  color: 0xffdd55, emissive: 0x443300, emissiveIntensity: 0.4, roughness: 0.6
+});
+const crosswalkMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 });
+
+// ========== SIDEWALK COLLISION DATA ==========
+const sidewalks = [];
+
+// ========== ՓՈՂՈՑՆԵՐԻ ՄԵԾԱՑՈՒՄԸ ==========
+// Sidewalk-ը գծելիս ամեն փողոց «կտրում» ենք ուղղահայաց փողոցների տարածքում։
+
+const SIDEWALK_WIDTH = 1.5;
+const SIDEWALK_HEIGHT = 0.25;
+
+// Ուղղահայաց փողոցների x-միջակայքերը (bացվածքների համար)
+const VERTICAL_GAPS = [
+  { min: -7 - SIDEWALK_WIDTH, max: 7 + SIDEWALK_WIDTH },     // avenue
+  { min: -41 - SIDEWALK_WIDTH, max: -31 + SIDEWALK_WIDTH },   // main
+  { min: -75 - SIDEWALK_WIDTH, max: -68 + SIDEWALK_WIDTH },   // small
+  { min: 31 - SIDEWALK_WIDTH, max: 41 + SIDEWALK_WIDTH },     // main
+  { min: 68 - SIDEWALK_WIDTH, max: 75 + SIDEWALK_WIDTH },     // small
+];
+
+// Հորիզոնական փողոցների z-միջակայքերը
+const HORIZONTAL_GAPS = [
+  { min: -7 - SIDEWALK_WIDTH, max: 7 + SIDEWALK_WIDTH },
+  { min: -41 - SIDEWALK_WIDTH, max: -31 + SIDEWALK_WIDTH },
+  { min: -75 - SIDEWALK_WIDTH, max: -68 + SIDEWALK_WIDTH },
+  { min: 31 - SIDEWALK_WIDTH, max: 41 + SIDEWALK_WIDTH },
+  { min: 68 - SIDEWALK_WIDTH, max: 75 + SIDEWALK_WIDTH },
+];
+
+// Ֆունկցիա՝ վերադարձնում է [start, end] հատվածների զանգված՝
+// բաց թողնելով gaps-ի տարածքները
+function splitSegment(start, end, gaps) {
+  const segments = [];
+  let cursor = start;
+
+  // Դասավորում ենք gaps-ը ըստ min-ի
+  const sorted = [...gaps].sort((a, b) => a.min - b.min);
+
+  for (const g of sorted) {
+    if (g.max <= cursor) continue;
+    if (g.min >= end) break;
+
+    const segEnd = Math.max(cursor, g.min);
+    if (segEnd > cursor) {
+      segments.push({ start: cursor, end: segEnd });
+    }
+    cursor = Math.max(cursor, g.max);
+  }
+
+  if (cursor < end) {
+    segments.push({ start: cursor, end: end });
+  }
+
+  return segments;
+}
+
+// ========== BUILD STREETS ==========
+STREETS.forEach(s => {
+  const w = s.x2 - s.x1;
+  const d = s.z2 - s.z1;
+  const cx = (s.x1 + s.x2) / 2;
+  const cz = (s.z1 + s.z2) / 2;
+  const isHorizontal = w > d;
+
+  // --- Road surface ---
+  const roadMat = s.type === 'avenue' ? avenueMat : streetMat;
+  const road = new THREE.Mesh(
+    new THREE.BoxGeometry(w, 0.05, d),
+    roadMat
+  );
+  road.position.set(cx, 0.03, cz);
+  road.receiveShadow = true;
+  scene.add(road);
+
+  // --- Sidewalks (ԿՏՐՎԱԾ) ---
+  if (isHorizontal) {
+    // Հորիզոնական փողոցի մայթերը ձգվում են x-ով,
+    // բաց թողնելով VERTICAL_GAPS-ը
+    const segments = splitSegment(s.x1, s.x2, VERTICAL_GAPS);
+
+    // Հյուսիսային մայթ (z = s.z1 - sw-ից մինչև s.z1)
+    // Հարավային մայթ (z = s.z2-ից մինչև s.z2 + sw)
+    segments.forEach(seg => {
+      const segW = seg.end - seg.start;
+      const segCx = (seg.start + seg.end) / 2;
+
+      // Հյուսիս
+      const n = new THREE.Mesh(
+        new THREE.BoxGeometry(segW, SIDEWALK_HEIGHT, SIDEWALK_WIDTH),
+        sidewalkMat
+      );
+      n.position.set(segCx, SIDEWALK_HEIGHT / 2, s.z1 - SIDEWALK_WIDTH / 2);
+      n.receiveShadow = true;
+      n.castShadow = true;
+      scene.add(n);
+
+      // Հարավ
+      const so = new THREE.Mesh(
+        new THREE.BoxGeometry(segW, SIDEWALK_HEIGHT, SIDEWALK_WIDTH),
+        sidewalkMat
+      );
+      so.position.set(segCx, SIDEWALK_HEIGHT / 2, s.z2 + SIDEWALK_WIDTH / 2);
+      so.receiveShadow = true;
+      so.castShadow = true;
+      scene.add(so);
+
+      // Collision
+      sidewalks.push({
+        minX: seg.start, maxX: seg.end,
+        minZ: s.z1 - SIDEWALK_WIDTH, maxZ: s.z1
+      });
+      sidewalks.push({
+        minX: seg.start, maxX: seg.end,
+        minZ: s.z2, maxZ: s.z2 + SIDEWALK_WIDTH
+      });
+
+      // Curb — հյուսիս
+      const c1 = new THREE.Mesh(
+        new THREE.BoxGeometry(segW, 0.3, 0.15),
+        curbMat
+      );
+      c1.position.set(segCx, 0.15, s.z1 - 0.075);
+      c1.castShadow = true;
+      scene.add(c1);
+
+      // Curb — հարավ
+      const c2 = new THREE.Mesh(
+        new THREE.BoxGeometry(segW, 0.3, 0.15),
+        curbMat
+      );
+      c2.position.set(segCx, 0.15, s.z2 + 0.075);
+      c2.castShadow = true;
+      scene.add(c2);
+    });
+  } else {
+    // Ուղղահայաց փողոցի մայթերը ձգվում են z-ով,
+    // բաց թողնելով HORIZONTAL_GAPS-ը
+    const segments = splitSegment(s.z1, s.z2, HORIZONTAL_GAPS);
+
+    segments.forEach(seg => {
+      const segD = seg.end - seg.start;
+      const segCz = (seg.start + seg.end) / 2;
+
+      // Արևմտյան մայթ (x = s.x1 - sw-ից մինչև s.x1)
+      const wst = new THREE.Mesh(
+        new THREE.BoxGeometry(SIDEWALK_WIDTH, SIDEWALK_HEIGHT, segD),
+        sidewalkMat
+      );
+      wst.position.set(s.x1 - SIDEWALK_WIDTH / 2, SIDEWALK_HEIGHT / 2, segCz);
+      wst.receiveShadow = true;
+      wst.castShadow = true;
+      scene.add(wst);
+
+      // Արևելյան մայթ
+      const est = new THREE.Mesh(
+        new THREE.BoxGeometry(SIDEWALK_WIDTH, SIDEWALK_HEIGHT, segD),
+        sidewalkMat
+      );
+      est.position.set(s.x2 + SIDEWALK_WIDTH / 2, SIDEWALK_HEIGHT / 2, segCz);
+      est.receiveShadow = true;
+      est.castShadow = true;
+      scene.add(est);
+
+      // Collision
+      sidewalks.push({
+        minX: s.x1 - SIDEWALK_WIDTH, maxX: s.x1,
+        minZ: seg.start, maxZ: seg.end
+      });
+      sidewalks.push({
+        minX: s.x2, maxX: s.x2 + SIDEWALK_WIDTH,
+        minZ: seg.start, maxZ: seg.end
+      });
+
+      // Curb — արևմուտք
+      const c1 = new THREE.Mesh(
+        new THREE.BoxGeometry(0.15, 0.3, segD),
+        curbMat
+      );
+      c1.position.set(s.x1 - 0.075, 0.15, segCz);
+      c1.castShadow = true;
+      scene.add(c1);
+
+      // Curb — արևելք
+      const c2 = new THREE.Mesh(
+        new THREE.BoxGeometry(0.15, 0.3, segD),
+        curbMat
+      );
+      c2.position.set(s.x2 + 0.075, 0.15, segCz);
+      c2.castShadow = true;
+      scene.add(c2);
+    });
+  }
+
+  // --- Center dashed line ---
+  if (s.type === 'avenue' || s.type === 'main') {
+    const length = Math.max(w, d);
+    const dashCount = Math.floor(length / 8);
+    const dashLength = 3;
+
+    for (let i = 0; i < dashCount; i++) {
+      const t = (i + 0.5) / dashCount;
+      const dash = new THREE.Mesh(
+        new THREE.BoxGeometry(
+          isHorizontal ? dashLength : 0.2,
+          0.06,
+          isHorizontal ? 0.2 : dashLength
+        ),
+        dashMat
+      );
+
+      if (isHorizontal) {
+        dash.position.set(s.x1 + w * t, 0.06, cz);
+      } else {
+        dash.position.set(cx, 0.06, s.z1 + d * t);
+      }
+      scene.add(dash);
+    }
+  }
+
+  // --- Avenue side lines ---
+  if (s.type === 'avenue') {
+    const lineMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff, emissive: 0x333333, emissiveIntensity: 0.2
+    });
+
+    if (isHorizontal) {
+      const line1 = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, 0.15), lineMat);
+      line1.position.set(cx, 0.06, s.z1 + 0.5);
+      scene.add(line1);
+
+      const line2 = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, 0.15), lineMat);
+      line2.position.set(cx, 0.06, s.z2 - 0.5);
+      scene.add(line2);
     } else {
-        enemy.hp -= superDamage;
+      const line1 = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.06, d), lineMat);
+      line1.position.set(s.x1 + 0.5, 0.06, cz);
+      scene.add(line1);
+
+      const line2 = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.06, d), lineMat);
+      line2.position.set(s.x2 - 0.5, 0.06, cz);
+      scene.add(line2);
+    }
+  }
+});
+
+// ========== CROSSWALKS AT INTERSECTIONS ==========
+const intersections = [];
+
+const hStreets = STREETS.filter(s => (s.x2 - s.x1) > (s.z2 - s.z1));
+const vStreets = STREETS.filter(s => (s.z2 - s.z1) > (s.x2 - s.x1));
+
+hStreets.forEach(h => {
+  vStreets.forEach(v => {
+    intersections.push({
+      x: (v.x1 + v.x2) / 2,
+      z: (h.z1 + h.z2) / 2,
+      hw: (v.x2 - v.x1) / 2,
+      hh: (h.z2 - h.z1) / 2
+    });
+  });
+});
+
+intersections.forEach(inter => {
+  const stripeCount = 4;
+  const stripeW = 0.7;
+  const stripeGap = 0.6;
+
+  for (let i = 0; i < stripeCount; i++) {
+    const offset = (i - (stripeCount - 1) / 2) * (stripeW + stripeGap);
+
+    const z1 = new THREE.Mesh(
+      new THREE.BoxGeometry(stripeW, 0.07, inter.hh * 0.8),
+      crosswalkMat
+    );
+    z1.position.set(inter.x + offset, 0.07, inter.z - inter.hh - 1.5);
+    scene.add(z1);
+
+    const z2 = new THREE.Mesh(
+      new THREE.BoxGeometry(stripeW, 0.07, inter.hh * 0.8),
+      crosswalkMat
+    );
+    z2.position.set(inter.x + offset, 0.07, inter.z + inter.hh + 1.5);
+    scene.add(z2);
+
+    const z3 = new THREE.Mesh(
+      new THREE.BoxGeometry(inter.hw * 0.8, 0.07, stripeW),
+      crosswalkMat
+    );
+    z3.position.set(inter.x - inter.hw - 1.5, 0.07, inter.z + offset);
+    scene.add(z3);
+
+    const z4 = new THREE.Mesh(
+      new THREE.BoxGeometry(inter.hw * 0.8, 0.07, stripeW),
+      crosswalkMat
+    );
+    z4.position.set(inter.x + inter.hw + 1.5, 0.07, inter.z + offset);
+    scene.add(z4);
+  }
+});
+
+// ========== STREET LIGHTS ==========
+const poleMat = new THREE.MeshStandardMaterial({
+  color: 0x2a2a2a, roughness: 0.7, metalness: 0.5
+});
+const lampMat = new THREE.MeshStandardMaterial({
+  color: 0xfff2cc, emissive: 0xffdd88, emissiveIntensity: 0.6
+});
+
+intersections.forEach(inter => {
+  const corners = [
+    { dx: -1, dz: -1 },
+    { dx: 1, dz: -1 },
+    { dx: -1, dz: 1 },
+    { dx: 1, dz: 1 }
+  ];
+
+  corners.forEach(c => {
+    const px = inter.x + c.dx * (inter.hw + 1.2);
+    const pz = inter.z + c.dz * (inter.hh + 1.2);
+
+    const pole = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.12, 0.15, 6, 8),
+      poleMat
+    );
+    pole.position.set(px, 3, pz);
+    pole.castShadow = true;
+    scene.add(pole);
+
+    const lamp = new THREE.Mesh(
+      new THREE.SphereGeometry(0.4, 12, 12),
+      lampMat
+    );
+    lamp.position.set(px, 6.2, pz);
+    scene.add(lamp);
+  });
+});
+
+/* ============================================================
+   ՄԱՍ 4 — BUILDINGS + LANDMARKS (ՎԵՐՋՆԱԿԱՆ)
+   ============================================================ */
+
+// ========== BUILDING COLORS ==========
+const buildingColors = [
+  0xd4a373, 0xccd5ae, 0xe9edc9, 0xfaedcd,
+  0xb08968, 0xa68a6d, 0xc9ada7, 0xe8d5b7,
+  0xd9bfa3, 0xc4a484, 0xbfa980, 0xe6d5b8
+];
+
+const roofColors = [0x8b5a3c, 0x6b4423, 0x7a5c3f, 0x5c4033];
+
+// ========== COLLISION ARRAYS ==========
+// Շենքերի կոլիզիայի տվյալներ
+const buildings = [];
+
+// Landmark-ների կոլիզիայի տվյալներ (առանձին)
+const landmarks = [];
+
+// ========== BUILDING FACTORY ==========
+function addBuilding(x, z, w, d, h) {
+  if (!isFinite(x) || !isFinite(z) || !isFinite(w) || !isFinite(d) || !isFinite(h)) {
+    return;
+  }
+  if (w <= 0 || d <= 0 || h <= 0) return;
+
+  const color = buildingColors[Math.floor(Math.random() * buildingColors.length)];
+  const roofColor = roofColors[Math.floor(Math.random() * roofColors.length)];
+
+  // --- Main body ---
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(w, h, d),
+    new THREE.MeshStandardMaterial({ color, roughness: 0.9 })
+  );
+  body.position.set(x, h / 2, z);
+  body.castShadow = true;
+  body.receiveShadow = true;
+  scene.add(body);
+
+  // --- Roof ---
+  const roof = new THREE.Mesh(
+    new THREE.BoxGeometry(w + 0.6, 0.5, d + 0.6),
+    new THREE.MeshStandardMaterial({ color: roofColor, roughness: 0.85 })
+  );
+  roof.position.set(x, h + 0.25, z);
+  roof.castShadow = true;
+  scene.add(roof);
+
+  // --- Windows ---
+  const winMat = new THREE.MeshStandardMaterial({
+    color: 0x88ccff,
+    emissive: 0x224466,
+    emissiveIntensity: 0.5,
+    roughness: 0.2,
+    metalness: 0.3
+  });
+
+  const winW = 1.2;
+  const winH = 1.6;
+  const winGapX = 2.8;
+  const winGapY = 3.2;
+  const rows = Math.max(0, Math.floor((h - 2) / winGapY));
+  const colsX = Math.max(0, Math.floor((w - 2) / winGapX));
+  const colsZ = Math.max(0, Math.floor((d - 2) / winGapX));
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < colsX; c++) {
+      const wx = x - w / 2 + 1.5 + c * winGapX;
+      const wy = 2.5 + r * winGapY;
+
+      const winF = new THREE.Mesh(
+        new THREE.BoxGeometry(winW, winH, 0.1),
+        winMat
+      );
+      winF.position.set(wx, wy, z + d / 2 + 0.06);
+      scene.add(winF);
+
+      const winB = new THREE.Mesh(
+        new THREE.BoxGeometry(winW, winH, 0.1),
+        winMat
+      );
+      winB.position.set(wx, wy, z - d / 2 - 0.06);
+      scene.add(winB);
+    }
+  }
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < colsZ; c++) {
+      const wz = z - d / 2 + 1.5 + c * winGapX;
+      const wy = 2.5 + r * winGapY;
+
+      const winL = new THREE.Mesh(
+        new THREE.BoxGeometry(0.1, winH, winW),
+        winMat
+      );
+      winL.position.set(x - w / 2 - 0.06, wy, wz);
+      scene.add(winL);
+
+      const winR = new THREE.Mesh(
+        new THREE.BoxGeometry(0.1, winH, winW),
+        winMat
+      );
+      winR.position.set(x + w / 2 + 0.06, wy, wz);
+      scene.add(winR);
+    }
+  }
+
+  // --- Collision data ---
+  buildings.push({
+    x, z, w, d, h,
+    minX: x - w / 2,
+    maxX: x + w / 2,
+    minZ: z - d / 2,
+    maxZ: z + d / 2
+  });
+}
+
+// ========== GENERATE BUILDINGS IN BLOCKS ==========
+// Բլոկները համապատասխան են ՄԱՍ 3-ի փողոցներին։
+// X: -100..-75, -68..-41, -31..-7, 7..31, 41..68, 75..100
+// Z: նույնը
+
+const BLOCK_X = [
+  { min: -100, max: -75 },
+  { min: -68,  max: -41 },
+  { min: -31,  max: -7  },
+  { min: 7,    max: 31  },
+  { min: 41,   max: 68  },
+  { min: 75,   max: 100 }
+];
+
+const BLOCK_Z = [
+  { min: -100, max: -75 },
+  { min: -68,  max: -41 },
+  { min: -31,  max: -7  },
+  { min: 7,    max: 31  },
+  { min: 41,   max: 68  },
+  { min: 75,   max: 100 }
+];
+
+// ⚠️ Landmark-ների բլոկները բաց թողնելու համար
+// Cascade → (7..31, 7..31)
+// Opera   → (-68..-41, 41..68)
+// Matenadaran → (41..68, -68..-41)
+function isLandmarkBlock(bx, bz) {
+  // Cascade
+  if (bx.min === 7 && bx.max === 31 && bz.min === 7 && bz.max === 31) return true;
+  // Opera
+  if (bx.min === -68 && bx.max === -41 && bz.min === 41 && bz.max === 68) return true;
+  // Matenadaran
+  if (bx.min === 41 && bx.max === 68 && bz.min === -68 && bz.max === -41) return true;
+  return false;
+}
+
+BLOCK_X.forEach(bx => {
+  BLOCK_Z.forEach(bz => {
+    // Բաց թողնում ենք landmark-ների բլոկները
+    if (isLandmarkBlock(bx, bz)) return;
+
+    const blockW = bx.max - bx.min;
+    const blockD = bz.max - bz.min;
+
+    if (blockW < 6 || blockD < 6) return;
+
+    const cx = (bx.min + bx.max) / 2;
+    const cz = (bz.min + bz.max) / 2;
+
+    const margin = 2;
+    const usableW = blockW - margin * 2;
+    const usableD = blockD - margin * 2;
+
+    if (usableW < 4 || usableD < 4) return;
+
+    if (Math.random() < 0.7) {
+      const bw = usableW * 0.9;
+      const bd = usableD * 0.9;
+      const h = 8 + Math.random() * 14;
+      addBuilding(cx, cz, bw, bd, h);
+    } else {
+      const bw = usableW * 0.42;
+      const bd = usableD * 0.9;
+      const h1 = 6 + Math.random() * 10;
+      const h2 = 6 + Math.random() * 10;
+      const offset = usableW * 0.25;
+      addBuilding(cx - offset, cz, bw, bd, h1);
+      addBuilding(cx + offset, cz, bw, bd, h2);
+    }
+  });
+});
+
+// ============================================================
+// LANDMARK 1 — CASCADE (Կասկադ)
+// ============================================================
+// Գտնվում է կենտրոնական բլոկում (7..31, 7..31)
+// 6 աստիճան, ամեն մեկը 20մ լայն, 3մ խոր, 2.5մ բարձր
+
+(function addCascade() {
+  const baseX = 19;
+  const baseZ = 19;
+  const steps = 6;
+  const stepMat = new THREE.MeshStandardMaterial({
+    color: 0xf5e6d3,
+    roughness: 0.8
+  });
+  const railMat = new THREE.MeshStandardMaterial({
+    color: 0xd4c4a8,
+    roughness: 0.7
+  });
+
+  for (let i = 0; i < steps; i++) {
+    const stepW = 20 - i * 2;
+    const stepH = 2.5;
+    const stepD = 3;
+
+    const step = new THREE.Mesh(
+      new THREE.BoxGeometry(stepW, stepH, stepD),
+      stepMat
+    );
+    step.position.set(baseX, stepH / 2 + i * stepH, baseZ - 8 + i * stepD);
+    step.castShadow = true;
+    step.receiveShadow = true;
+    scene.add(step);
+
+    const railL = new THREE.Mesh(
+      new THREE.BoxGeometry(0.6, 1.2, stepD),
+      railMat
+    );
+    railL.position.set(baseX - stepW / 2 + 0.3, stepH + i * stepH + 0.6, baseZ - 8 + i * stepD);
+    railL.castShadow = true;
+    scene.add(railL);
+
+    const railR = railL.clone();
+    railR.position.x = baseX + stepW / 2 - 0.3;
+    scene.add(railR);
+
+    // ✅ Ճշգրիտ collider ամեն աստիճանի համար
+    landmarks.push({
+      minX: baseX - stepW / 2,
+      maxX: baseX + stepW / 2,
+      minZ: baseZ - 8 + i * stepD - stepD / 2,
+      maxZ: baseZ - 8 + i * stepD + stepD / 2
+    });
+  }
+})();
+
+// ============================================================
+// LANDMARK 2 — OPERA (Օպերա)
+// ============================================================
+// Գտնվում է ձախ-ներքև բլոկում (-68..-41, 41..68)
+
+(function addOpera() {
+  const x = -54;
+  const z = 54;
+
+  const base = new THREE.Mesh(
+    new THREE.CylinderGeometry(10, 10, 3, 24),
+    new THREE.MeshStandardMaterial({ color: 0xe8d5b7, roughness: 0.8 })
+  );
+  base.position.set(x, 1.5, z);
+  base.castShadow = true;
+  base.receiveShadow = true;
+  scene.add(base);
+
+  const dome = new THREE.Mesh(
+    new THREE.SphereGeometry(10, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2),
+    new THREE.MeshStandardMaterial({ color: 0xc4a484, roughness: 0.7 })
+  );
+  dome.position.set(x, 3, z);
+  dome.castShadow = true;
+  scene.add(dome);
+
+  // ✅ Ճշգրիտ collider (շրջանագիծը որպես քառակուսի մոտարկում)
+  landmarks.push({
+    minX: x - 10,
+    maxX: x + 10,
+    minZ: z - 10,
+    maxZ: z + 10
+  });
+})();
+
+// ============================================================
+// LANDMARK 3 — MATENADARAN (Մատենադարան)
+// ============================================================
+// Գտնվում է աջ-վերև բլոկում (41..68, -68..-41)
+
+(function addMatenadaran() {
+  const x = 54;
+  const z = -54;
+
+  const base = new THREE.Mesh(
+    new THREE.BoxGeometry(18, 8, 14),
+    new THREE.MeshStandardMaterial({ color: 0xd9bfa3, roughness: 0.85 })
+  );
+  base.position.set(x, 4, z);
+  base.castShadow = true;
+  base.receiveShadow = true;
+  scene.add(base);
+
+  const colMat = new THREE.MeshStandardMaterial({ color: 0xf5e6d3, roughness: 0.7 });
+  for (let i = 0; i < 6; i++) {
+    const col = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.5, 0.5, 8, 12),
+      colMat
+    );
+    col.position.set(x - 7 + i * 2.8, 4, z + 8);
+    col.castShadow = true;
+    scene.add(col);
+  }
+
+  // ✅ Ճշգրիտ collider (միայն հիմնական մասը, սյուները բաց են)
+  landmarks.push({
+    minX: x - 9,
+    maxX: x + 9,
+    minZ: z - 7,
+    maxZ: z + 7
+  });
+})();
+
+/* ============================================================
+   ՄԱՍ 5 — SAMAKAT MODEL + INDIAN COURIER (ՎԵՐՋՆԱԿԱՆ)
+   ============================================================ */
+
+// ========== PLAYER GROUP ==========
+const player = new THREE.Group();
+player.position.set(0, 0, 20);
+scene.add(player);
+
+// ========== SAMAKAT BODY ==========
+const bodyMat = new THREE.MeshStandardMaterial({
+  color: 0xff6b35,
+  roughness: 0.5,
+  metalness: 0.3
+});
+
+const body = new THREE.Mesh(
+  new THREE.BoxGeometry(1.8, 1.0, 3.4),
+  bodyMat
+);
+body.position.set(0, 0.7, 0);
+body.castShadow = true;
+body.receiveShadow = true;
+player.add(body);
+
+const hood = new THREE.Mesh(
+  new THREE.BoxGeometry(1.6, 0.7, 1.0),
+  bodyMat
+);
+hood.position.set(0, 0.75, 1.3);
+hood.castShadow = true;
+player.add(hood);
+
+const trunk = new THREE.Mesh(
+  new THREE.BoxGeometry(1.7, 0.8, 1.0),
+  bodyMat
+);
+trunk.position.set(0, 0.8, -1.4);
+trunk.castShadow = true;
+player.add(trunk);
+
+// ========== CABIN ==========
+const cabinMat = new THREE.MeshStandardMaterial({
+  color: 0xffaa55,
+  roughness: 0.6,
+  metalness: 0.2
+});
+
+const cabin = new THREE.Mesh(
+  new THREE.BoxGeometry(1.6, 1.0, 1.6),
+  cabinMat
+);
+cabin.position.set(0, 1.6, -0.2);
+cabin.castShadow = true;
+player.add(cabin);
+
+// ========== GLASS ==========
+const glassMat = new THREE.MeshStandardMaterial({
+  color: 0x88ccff,
+  transparent: true,
+  opacity: 0.6,
+  roughness: 0.1,
+  metalness: 0.5
+});
+
+const windshield = new THREE.Mesh(
+  new THREE.BoxGeometry(1.5, 0.8, 0.1),
+  glassMat
+);
+windshield.position.set(0, 1.7, 0.62);
+player.add(windshield);
+
+const sideGlassL = new THREE.Mesh(
+  new THREE.BoxGeometry(0.1, 0.7, 1.3),
+  glassMat
+);
+sideGlassL.position.set(-0.82, 1.7, -0.2);
+player.add(sideGlassL);
+
+const sideGlassR = sideGlassL.clone();
+sideGlassR.position.x = 0.82;
+player.add(sideGlassR);
+
+// ========== WHEELS ==========
+const wheelMat = new THREE.MeshStandardMaterial({
+  color: 0x1a1a1a,
+  roughness: 0.9
+});
+
+const rimMat = new THREE.MeshStandardMaterial({
+  color: 0xcccccc,
+  roughness: 0.3,
+  metalness: 0.8
+});
+
+const wheelGeo = new THREE.CylinderGeometry(0.45, 0.45, 0.35, 16);
+const rimGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.37, 12);
+
+const wheelPositions = [
+  { x: -0.95, z: 1.15 },
+  { x: 0.95, z: 1.15 },
+  { x: -0.95, z: -1.15 },
+  { x: 0.95, z: -1.15 }
+];
+
+const wheels = [];
+
+wheelPositions.forEach(pos => {
+  const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+  wheel.rotation.z = Math.PI / 2;
+  wheel.position.set(pos.x, 0.45, pos.z);
+  wheel.castShadow = true;
+  player.add(wheel);
+
+  const rim = new THREE.Mesh(rimGeo, rimMat);
+  rim.rotation.z = Math.PI / 2;
+  rim.position.set(pos.x, 0.45, pos.z);
+  player.add(rim);
+
+  wheels.push(wheel);
+});
+
+// ========== HEADLIGHTS ==========
+const headlightMat = new THREE.MeshStandardMaterial({
+  color: 0xffffcc,
+  emissive: 0xffee88,
+  emissiveIntensity: 1.2
+});
+
+const headlightL = new THREE.Mesh(
+  new THREE.BoxGeometry(0.35, 0.25, 0.1),
+  headlightMat
+);
+headlightL.position.set(-0.55, 0.85, 1.82);
+player.add(headlightL);
+
+const headlightR = headlightL.clone();
+headlightR.position.x = 0.55;
+player.add(headlightR);
+
+// ========== TAILLIGHTS ==========
+const taillightMat = new THREE.MeshStandardMaterial({
+  color: 0xff3333,
+  emissive: 0xaa0000,
+  emissiveIntensity: 0.8
+});
+
+const taillightL = new THREE.Mesh(
+  new THREE.BoxGeometry(0.3, 0.2, 0.1),
+  taillightMat
+);
+taillightL.position.set(-0.55, 0.9, -1.92);
+player.add(taillightL);
+
+const taillightR = taillightL.clone();
+taillightR.position.x = 0.55;
+player.add(taillightR);
+
+// ========== COURIER (INDIAN DRIVER) ==========
+const skinMat = new THREE.MeshStandardMaterial({
+  color: 0x8b5a2b,
+  roughness: 0.8
+});
+
+const shirtMat = new THREE.MeshStandardMaterial({
+  color: 0x2a7a3a,
+  roughness: 0.7
+});
+
+const torso = new THREE.Mesh(
+  new THREE.BoxGeometry(0.9, 1.0, 0.6),
+  shirtMat
+);
+torso.position.set(0, 2.4, -0.2);
+torso.castShadow = true;
+player.add(torso);
+
+const head = new THREE.Mesh(
+  new THREE.BoxGeometry(0.6, 0.6, 0.6),
+  skinMat
+);
+head.position.set(0, 3.2, -0.2);
+head.castShadow = true;
+player.add(head);
+
+const turbanMat = new THREE.MeshStandardMaterial({
+  color: 0xff9933,
+  roughness: 0.7
+});
+
+const turban = new THREE.Mesh(
+  new THREE.SphereGeometry(0.42, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+  turbanMat
+);
+turban.position.set(0, 3.5, -0.2);
+turban.castShadow = true;
+player.add(turban);
+
+const eyeMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+const eyeL = new THREE.Mesh(
+  new THREE.SphereGeometry(0.06, 8, 8),
+  eyeMat
+);
+eyeL.position.set(-0.15, 3.25, 0.11);
+player.add(eyeL);
+
+const eyeR = eyeL.clone();
+eyeR.position.x = 0.15;
+player.add(eyeR);
+
+const armGeo = new THREE.BoxGeometry(0.25, 0.25, 0.9);
+const armL = new THREE.Mesh(armGeo, skinMat);
+armL.position.set(-0.55, 2.4, 0.2);
+armL.rotation.x = -0.3;
+player.add(armL);
+
+const armR = armL.clone();
+armR.position.x = 0.55;
+player.add(armR);
+
+const handGeo = new THREE.SphereGeometry(0.15, 8, 8);
+const handL = new THREE.Mesh(handGeo, skinMat);
+handL.position.set(-0.5, 2.3, 0.65);
+player.add(handL);
+
+const handR = handL.clone();
+handR.position.x = 0.5;
+player.add(handR);
+
+const steerMat = new THREE.MeshStandardMaterial({
+  color: 0x1a1a1a,
+  roughness: 0.5
+});
+
+const steering = new THREE.Mesh(
+  new THREE.TorusGeometry(0.3, 0.05, 8, 16),
+  steerMat
+);
+steering.position.set(0, 2.3, 0.55);
+steering.rotation.x = -0.5;
+player.add(steering);
+
+// ========== DELIVERY BAG ==========
+const bagMat = new THREE.MeshStandardMaterial({
+  color: 0xdd3333,
+  roughness: 0.7
+});
+
+const bag = new THREE.Mesh(
+  new THREE.BoxGeometry(0.9, 1.0, 0.5),
+  bagMat
+);
+bag.position.set(0, 2.4, -0.75);
+bag.castShadow = true;
+player.add(bag);
+
+const bagFlap = new THREE.Mesh(
+  new THREE.BoxGeometry(0.9, 0.15, 0.55),
+  new THREE.MeshStandardMaterial({ color: 0xaa2222, roughness: 0.7 })
+);
+bagFlap.position.set(0, 2.9, -0.75);
+player.add(bagFlap);
+
+const bagLogo = new THREE.Mesh(
+  new THREE.BoxGeometry(0.4, 0.4, 0.02),
+  new THREE.MeshStandardMaterial({
+    color: 0xffd166,
+    emissive: 0x443300,
+    emissiveIntensity: 0.3
+  })
+);
+bagLogo.position.set(0, 2.4, -1.01);
+player.add(bagLogo);
+
+// ========== SHADOW BLOB ==========
+const shadowBlob = new THREE.Mesh(
+  new THREE.CircleGeometry(1.6, 16),
+  new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    transparent: true,
+    opacity: 0.25
+  })
+);
+shadowBlob.rotation.x = -Math.PI / 2;
+shadowBlob.position.y = 0.02;
+player.add(shadowBlob);
+
+// ============================================================
+// PLAYER STATE — Ֆիզիկական վիճակ
+// ============================================================
+//
+// ⚠️ ԿՈՈՐԴԻՆԱՏՆԵՐԻ ՀԱՄԱԿԱՐԳ
+//
+// heading = 0 → forward = +Z
+// heading = π/2 → forward = +X
+// heading = π → forward = -Z
+// heading = -π/2 → forward = -X
+//
+// A (ձախ սեղմում) → heading-ը ԱՃՈՒՄ է (+)
+// D (աջ սեղմում) → heading-ը ՆՎԱԶՈՒՄ է (-)
+
+const playerState = {
+  speed: 0,                    // ընթացիկ արագություն (մ/վ)
+  maxSpeed: 22,                // առավելագույն արագություն
+  reverseSpeed: 8,             // հետընթաց արագություն
+  acceleration: 16,            // արագացում
+  brakeForce: 28,              // արգելակման ուժ
+  friction: 4.5,               // շփում (բնական դանդաղում)
+  turnSpeed: 1.6,              // ⚠️ շրջադարձի արագություն (փոքրացված 2.2-ից)
+  heading: 0,                  // ուղղություն (ռադիան)
+  angularVelocity: 0,          // ⚠️ անկյունային արագություն (իներցիա)
+  drift: 0,                    // սահքի էֆեկտ
+  maxAngularVelocity: 1.4,     // ⚠️ առավելագույն անկյունային արագություն
+  angularAccel: 5.0,           // ⚠️ անկյունային արագացում (սահուն անցում)
+  angularDamping: 3.5          // ⚠️ անկյունային մարում (երբ բաց ենք թողնում)
+};
+
+/* ============================================================
+   ՄԱՍ 6 — INPUT + COLLISION + PHYSICS + CAMERA (ՎԵՐՋՆԱԿԱՆ)
+   ============================================================ */
+
+// ============================================================
+// KEYBOARD INPUT
+// ============================================================
+
+const keys = {};
+
+window.addEventListener('keydown', (e) => {
+  keys[e.code] = true;
+
+  if (
+    e.code === 'Space' ||
+    e.code === 'ArrowUp' ||
+    e.code === 'ArrowDown' ||
+    e.code === 'ArrowLeft' ||
+    e.code === 'ArrowRight'
+  ) {
+    e.preventDefault();
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  keys[e.code] = false;
+});
+
+// ⚠️ Մաքրում ենք ստեղները, երբ պատուհանը կորցնում է focus-ը
+window.addEventListener('blur', () => {
+  for (const k in keys) keys[k] = false;
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    for (const k in keys) keys[k] = false;
+  }
+});
+
+// ============================================================
+// COLLISION CHECK
+// ============================================================
+
+function checkCollision(x, z, radius = 1.15) {
+  // Շենքեր
+  for (const b of buildings) {
+    const closestX = Math.max(b.minX, Math.min(x, b.maxX));
+    const closestZ = Math.max(b.minZ, Math.min(z, b.maxZ));
+    const dx = x - closestX;
+    const dz = z - closestZ;
+    if ((dx * dx + dz * dz) < radius * radius) return true;
+  }
+
+  // ⚠️ Landmark-ներ (Cascade, Opera, Matenadaran)
+  for (const b of landmarks) {
+    const closestX = Math.max(b.minX, Math.min(x, b.maxX));
+    const closestZ = Math.max(b.minZ, Math.min(z, b.maxZ));
+    const dx = x - closestX;
+    const dz = z - closestZ;
+    if ((dx * dx + dz * dz) < radius * radius) return true;
+  }
+
+  return false;
+}
+
+// ============================================================
+// PHYSICS
+// ============================================================
+
+function updatePhysics(dt) {
+  // ---------- INPUT ----------
+  const accelerating = keys['KeyW'] || keys['ArrowUp'];
+  const braking = keys['KeyS'] || keys['ArrowDown'];
+  const steeringLeft = keys['KeyA'] || keys['ArrowLeft'];
+  const steeringRight = keys['KeyD'] || keys['ArrowRight'];
+  const handbrake = keys['Space'];
+
+  // ---------- ACCELERATION ----------
+  if (accelerating) {
+    playerState.speed += playerState.acceleration * dt;
+  } else if (braking) {
+    if (playerState.speed > 0) {
+      playerState.speed -= playerState.brakeForce * dt;
+    } else {
+      playerState.speed -= playerState.acceleration * 0.55 * dt;
+    }
+  } else {
+    if (playerState.speed > 0) {
+      playerState.speed -= playerState.friction * dt;
+      if (playerState.speed < 0) playerState.speed = 0;
+    } else if (playerState.speed < 0) {
+      playerState.speed += playerState.friction * dt;
+      if (playerState.speed > 0) playerState.speed = 0;
+    }
+  }
+
+  playerState.speed = THREE.MathUtils.clamp(
+    playerState.speed,
+    -playerState.reverseSpeed,
+    playerState.maxSpeed
+  );
+
+  // ---------- TURNING (ԻՆԵՐՑԻԱՅՈՎ) ----------
+  //
+  // ⚠️ ՈՒՂՂՎԱԾ ՆՇԱՆԸ.
+  // A (ձախ) → turnInput = +1 → heading-ը աճում է → մեքենան +X ուղղությամբ
+  //    Երբ հետևից ենք նայում (+Z-ից -Z), +X-ը ձախ է ✅
+  // D (աջ)  → turnInput = -1 → heading-ը նվազում է → մեքենան -X ուղղությամբ
+  //    -X-ը աջ է ✅
+  let turnInput = 0;
+  if (steeringLeft) turnInput += 1;
+  if (steeringRight) turnInput -= 1;
+
+  const speedAbs = Math.abs(playerState.speed);
+  const canTurn = speedAbs > 0.15;
+
+  if (canTurn && turnInput !== 0) {
+    // Արագության ազդեցությունը շրջադարձի վրա
+    const speedFactor = THREE.MathUtils.clamp(
+      speedAbs / playerState.maxSpeed,
+      0.35,
+      1.0
+    );
+
+    // Ցանկալի angular velocity
+    const targetAngularVel =
+      turnInput * playerState.turnSpeed * speedFactor;
+
+    // Հետընթացի ժամանակ ուղղությունը հակառակ է
+    const sign = playerState.speed < 0 ? -1 : 1;
+
+    // Սահուն արագացում դեպի ցանկալի արժեքը (իներցիա)
+    playerState.angularVelocity = THREE.MathUtils.lerp(
+      playerState.angularVelocity,
+      targetAngularVel * sign,
+      playerState.angularAccel * dt
+    );
+  } else {
+    // Երբ չենք սեղմում — սահուն մարում է
+    playerState.angularVelocity = THREE.MathUtils.lerp(
+      playerState.angularVelocity,
+      0,
+      playerState.angularDamping * dt
+    );
+  }
+
+  // Սահմանափակում
+  playerState.angularVelocity = THREE.MathUtils.clamp(
+    playerState.angularVelocity,
+    -playerState.maxAngularVelocity,
+    playerState.maxAngularVelocity
+  );
+
+  // Կիրառում heading-ին
+  playerState.heading += playerState.angularVelocity * dt;
+
+  // ---------- HANDBRAKE ----------
+  if (handbrake) {
+    playerState.speed *= Math.pow(0.04, dt);
+    playerState.drift = THREE.MathUtils.lerp(playerState.drift, 1, 8 * dt);
+  } else {
+    playerState.drift = THREE.MathUtils.lerp(playerState.drift, 0, 6 * dt);
+  }
+
+  // ---------- MOVEMENT ----------
+  const distance = playerState.speed * dt;
+  const forwardX = Math.sin(playerState.heading);
+  const forwardZ = Math.cos(playerState.heading);
+
+  const newX = player.position.x + forwardX * distance;
+  const newZ = player.position.z + forwardZ * distance;
+
+  // ---------- COLLISION + WALL SLIDING ----------
+  if (!checkCollision(newX, newZ)) {
+    // Ազատ ճանապարհ
+    player.position.x = newX;
+    player.position.z = newZ;
+  } else {
+    // Փորձենք միայն X-ով
+    const tryX = player.position.x + forwardX * distance;
+    const tryZ = player.position.z;
+
+    // Փորձենք միայն Z-ով
+    const tryX2 = player.position.x;
+    const tryZ2 = player.position.z + forwardZ * distance;
+
+    if (!checkCollision(tryX, tryZ)) {
+      // Սահում ենք պատի երկայնքով (X-ով)
+      player.position.x = tryX;
+      playerState.speed *= 0.6;
+    } else if (!checkCollision(tryX2, tryZ2)) {
+      // Սահում ենք պատի երկայնքով (Z-ով)
+      player.position.z = tryZ2;
+      playerState.speed *= 0.6;
+    } else {
+      // Ամբողջովին արգելափակված
+      playerState.speed *= -0.15;
+    }
+  }
+
+  // ---------- PLAYER ROTATION ----------
+  player.rotation.y = playerState.heading;
+
+  // ---------- WHEEL ROTATION ----------
+  // ⚠️ ՈՒՂՂՎԱԾ. Անիվները դրված են rotation.z = π/2-ով (կողքի վրա),
+  // դրա համար գլորվելու համար պետք է պտտել rotation.y-ով։
+  const wheelRotation = playerState.speed * dt * 2.5;
+  wheels.forEach(wheel => {
+    wheel.rotation.x += wheelRotation;
+  });
+
+  // ---------- SUN FOLLOW PLAYER ----------
+  sunTarget.position.copy(player.position);
+  sun.position.copy(player.position).add(SUN_OFFSET);
+}
+
+// ============================================================
+// CHASE CAMERA (ՄԻՇՏ ՀԵՏԵՎԻՑ)
+// ============================================================
+
+const camLookAt = new THREE.Vector3();
+const camDesiredPos = new THREE.Vector3();
+const camDesiredLook = new THREE.Vector3();
+let camInitialized = false;
+
+function updateCamera(dt) {
+  const h = playerState.heading;
+  const forwardX = Math.sin(h);
+  const forwardZ = Math.cos(h);
+
+  // Տեսախցիկը կանգնում է մեքենայի ՀԵՏԵՎՈՒՄ
+  camDesiredPos.set(
+    player.position.x - forwardX * CAM_DISTANCE,
+    player.position.y + CAM_HEIGHT,
+    player.position.z - forwardZ * CAM_DISTANCE
+  );
+
+  // Նայում է մեքենայից ԱՌԱՋ
+  camDesiredLook.set(
+    player.position.x + forwardX * CAM_LOOK_AHEAD,
+    player.position.y + 1.5,
+    player.position.z + forwardZ * CAM_LOOK_AHEAD
+  );
+
+  // Սահուն lerp
+  const posLerp = 1 - Math.exp(-CAM_SMOOTH_POS * dt);
+  const lookLerp = 1 - Math.exp(-CAM_SMOOTH_LOOK * dt);
+
+  camera.position.lerp(camDesiredPos, posLerp);
+
+  if (!camInitialized) {
+    camLookAt.copy(camDesiredLook);
+    camInitialized = true;
+  } else {
+    camLookAt.lerp(camDesiredLook, lookLerp);
+  }
+  camera.lookAt(camLookAt);
+}
+
+// ============================================================
+// SPEED DISPLAY (DOM throttle)
+// ============================================================
+
+const speedNumEl = document.getElementById('speedNum');
+let lastSpeedKmh = -1;
+
+function updateSpeedDisplay() {
+  const kmh = Math.round(Math.abs(playerState.speed) * 3.6);
+  if (kmh !== lastSpeedKmh) {
+    speedNumEl.textContent = kmh;
+    lastSpeedKmh = kmh;
+  }
+}
+
+/* ============================================================
+   ՄԱՍ 7 — DELIVERY MISSION SYSTEM (ՎԵՐՋՆԱԿԱՆ)
+   ============================================================ */
+
+// ========== MISSION STATE ==========
+const missionState = {
+  phase: 'pickup',        // 'pickup' | 'deliver'
+  pickupPoint: null,      // { x, z }
+  deliverPoint: null,     // { x, z }
+  pickupMarker: null,     // Three.js mesh
+  deliverMarker: null,    // Three.js mesh
+  pickupRadius: 4.0,      // ⚠️ 3.5 → 4.0
+  deliverRadius: 4.0,
+  locked: false           // ⚠️ ՆՈՐ — կրկնակի completeDelivery-ից խուսափելու համար
+};
+
+// ========== GAME STATE ==========
+const gameState = {
+  score: 0,
+  delivered: 0,
+  startTime: Date.now(),
+  running: false
+};
+
+// ========== MARKER FACTORY ==========
+function createMarker(color) {
+  const group = new THREE.Group();
+
+  // Հիմքի շրջան
+  const ringGeo = new THREE.RingGeometry(2.5, 3.2, 32);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.8
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.y = 0.15;
+  group.add(ring);
+
+  // Ներքին շրջան
+  const discGeo = new THREE.CircleGeometry(2.5, 32);
+  const discMat = new THREE.MeshBasicMaterial({
+    color,
+    transparent: true,
+    opacity: 0.25,
+    side: THREE.DoubleSide
+  });
+  const disc = new THREE.Mesh(discGeo, discMat);
+  disc.rotation.x = -Math.PI / 2;
+  disc.position.y = 0.12;
+  group.add(disc);
+
+  // Ուղղահայաց ճառագայթ
+  const beamGeo = new THREE.CylinderGeometry(0.4, 0.4, 12, 12, 1, true);
+  const beamMat = new THREE.MeshBasicMaterial({
+    color,
+    transparent: true,
+    opacity: 0.35,
+    side: THREE.DoubleSide
+  });
+  const beam = new THREE.Mesh(beamGeo, beamMat);
+  beam.position.y = 6;
+  group.add(beam);
+
+  // Իկոն
+  const iconGeo = new THREE.SphereGeometry(0.7, 16, 16);
+  const iconMat = new THREE.MeshStandardMaterial({
+    color,
+    emissive: color,
+    emissiveIntensity: 0.6
+  });
+  const iconMesh = new THREE.Mesh(iconGeo, iconMat);
+  iconMesh.position.y = 3;
+  group.add(iconMesh);
+
+  group.userData.ring = ring;
+  group.userData.beam = beam;
+  group.userData.icon = iconMesh;
+
+  return group;
+}
+
+// ========== RANDOM POSITION IN STREETS ==========
+// ⚠️ Օգտագործում ենք ավելի մեծ radius, որ մարկերը չհայտնվի
+// շենքի պատին կպած
+function getRandomStreetPosition(excludePoint = null) {
+  const attempts = 80;
+  const SAFE_RADIUS = 4.5;
+
+  for (let i = 0; i < attempts; i++) {
+    const street = STREETS[Math.floor(Math.random() * STREETS.length)];
+    const isHorizontal = (street.x2 - street.x1) > (street.z2 - street.z1);
+
+    let x, z;
+    if (isHorizontal) {
+      x = street.x1 + Math.random() * (street.x2 - street.x1);
+      z = (street.z1 + street.z2) / 2;
+    } else {
+      x = (street.x1 + street.x2) / 2;
+      z = street.z1 + Math.random() * (street.z2 - street.z1);
     }
 
-    enemy.squashX = 1.4;
-    enemy.squashY = 0.6;
-    enemy.hitPopups.push({ text: `⚡ -${superDamage} SUPER!`, alpha: 1, yOffset: 0 });
+    // Հեռավորությունը խաղացողից (առնվազն 20մ)
+    const dx = x - player.position.x;
+    const dz = z - player.position.z;
+    const distSq = dx * dx + dz * dz;
+    if (distSq < 400) continue;
 
-    checkGameOver();
-    if (!gameOver) switchTurn();
-    updateHUD();
+    // ⚠️ Հեռավորությունը excludePoint-ից (առնվազն 20մ)
+    if (excludePoint) {
+      const ex = x - excludePoint.x;
+      const ez = z - excludePoint.z;
+      if ((ex * ex + ez * ez) < 400) continue;
+    }
+
+    // ⚠️ Ստուգում ենք ավելի մեծ radius-ով, որ մարկերը չհպվի շենքին
+    if (checkCollision(x, z, SAFE_RADIUS)) continue;
+
+    return { x, z };
+  }
+
+  // Fallback
+  return { x: 0, z: 20 };
 }
 
+// ========== START NEW MISSION ==========
+function startNewMission() {
+  // Մաքրում ենք հին ցուցիչները
+  if (missionState.pickupMarker) {
+    scene.remove(missionState.pickupMarker);
+    missionState.pickupMarker = null;
+  }
+  if (missionState.deliverMarker) {
+    scene.remove(missionState.deliverMarker);
+    missionState.deliverMarker = null;
+  }
 
-        function handleHit(projectile) {
-            let target = projectile.target;
-            let shooter = projectile.shooter;
-            let dmg = projectile.damage;
+  // Նոր կետեր
+  missionState.pickupPoint = getRandomStreetPosition();
+  missionState.deliverPoint = getRandomStreetPosition(missionState.pickupPoint);
 
-            let excessDamage = 0;
-            if (dmg > target.hp) {
-                excessDamage = dmg - target.hp;
-                target.hp = 0;
-            } else {
-                target.hp -= dmg;
-            }
+  // Ստեղծում ենք ցուցիչները
+  missionState.pickupMarker = createMarker(0x4facfe);
+  missionState.pickupMarker.position.set(
+    missionState.pickupPoint.x,
+    0,
+    missionState.pickupPoint.z
+  );
+  scene.add(missionState.pickupMarker);
 
-            target.squashX = 1.25;
-            target.squashY = 0.75;
-            target.hitPopups.push({ text: `-${dmg - excessDamage}`, alpha: 1, yOffset: 0 });
+  missionState.deliverMarker = createMarker(0xf5576c);
+  missionState.deliverMarker.position.set(
+    missionState.deliverPoint.x,
+    0,
+    missionState.deliverPoint.z
+  );
+  // Սկզբում թաքցնում ենք deliver-ը
+  missionState.deliverMarker.visible = false;
+  scene.add(missionState.deliverMarker);
 
-            if (excessDamage > 0) {
-                shooter.hp -= excessDamage;
-                if (shooter.hp < 0) shooter.hp = 0;
-                shooter.squashX = 1.2;
-                shooter.squashY = 0.8;
-                shooter.hitPopups.push({ text: `⚠️ Հետհարված: -${excessDamage}`, alpha: 1, yOffset: -25 });
-            }
+  // Փուլը՝ pickup
+  missionState.phase = 'pickup';
+  missionState.locked = false;  // ⚠️ ապակողպում ենք նոր առաքելության համար
 
-            for (let i = 0; i < 25; i++) {
-                particles.push({
-                    x: target.castleX, y: 480,
-                    vx: (Math.random() - 0.5) * 14, vy: (Math.random() - 0.7) * 10,
-                    radius: Math.random() * 6 + 2, color: "#f59e0b", alpha: 1, decay: 0.02
-                });
-            }
+  updateMissionUI();
+}
 
-            checkGameOver();
-            if (!gameOver) switchTurn();
-            updateHUD();
-        }
+// ========== MISSION UI ==========
+const missionEl = document.getElementById('mission');
 
-        // ⚡ SUPER ABILITY USE FUNCTION
-        function useSuperAbility() {
-            if (currentLevelIdx < 2) return; // Միայն 3-րդ մակարդակից սկսած (Level 3-ը ունի index 2)
-            if (superCooldownCurrent < superCooldownMax) return;
-            if (currentTurn !== 0 || flyingProjectile || gameOver) return;
+function updateMissionUI() {
+  if (missionState.phase === 'pickup') {
+    missionEl.textContent = '📍 Գնա՛ պատվերի կետ';
+    missionEl.classList.remove('deliver');
+  } else {
+    missionEl.textContent = '📦 Հասցրու՛ հաճախորդին';
+    missionEl.classList.add('deliver');
+  }
+}
 
-            superCooldownCurrent = 0;
-            flashEffectTimer = 14; // Կայծակի էֆեկտի տևողությունը
+// ========== CHECK MISSION PROGRESS ==========
+function checkMissionProgress() {
+  // ⚠️ ԿՐԻՏԻԿԱԿԱՆ. Եթե արդեն ավարտված է, չկրկնենք
+  if (missionState.locked) return;
 
-            let superDamage = 35;
-            let enemy = players[1];
+  if (missionState.phase === 'pickup' && missionState.pickupPoint) {
+    const dx = player.position.x - missionState.pickupPoint.x;
+    const dz = player.position.z - missionState.pickupPoint.z;
+    const distSq = dx * dx + dz * dz;
 
-            if (superDamage > enemy.hp) {
-                let excess = superDamage - enemy.hp;
-                enemy.hp = 0;
-                players[0].hp = Math.max(0, players[0].hp - excess);
-            } else {
-                enemy.hp -= superDamage;
-            }
+    if (distSq < missionState.pickupRadius * missionState.pickupRadius) {
+      // Վերցրինք պատվերը
+      missionState.phase = 'deliver';
+      missionState.pickupMarker.visible = false;
+      missionState.deliverMarker.visible = true;
+      updateMissionUI();
+      showToast('📦 Պատվերը վերցվեց!');
+    }
+  } else if (missionState.phase === 'deliver' && missionState.deliverPoint) {
+    const dx = player.position.x - missionState.deliverPoint.x;
+    const dz = player.position.z - missionState.deliverPoint.z;
+    const distSq = dx * dx + dz * dz;
 
-            enemy.squashX = 1.4;
-            enemy.squashY = 0.6;
-            enemy.hitPopups.push({ text: `⚡ -${superDamage} SUPER!`, alpha: 1, yOffset: 0 });
+    if (distSq < missionState.deliverRadius * missionState.deliverRadius) {
+      // Առաքվեց
+      completeDelivery();
+    }
+  }
+}
 
-            checkGameOver();
-            if (!gameOver) switchTurn();
-            updateHUD();
-        }
+// ========== COMPLETE DELIVERY ==========
+function completeDelivery() {
+  // ⚠️ Կրկնակի կանչից պաշտպանություն
+  if (missionState.locked) return;
+  missionState.locked = true;
 
-        function switchTurn() {
-            currentTurn = 1 - currentTurn;
-            
-            // ⚡ Ամեն անգամ երբ հերթը վերադառնում է խաղացողին, լիցքավորում ենք Super-ը
-            if (currentTurn === 0 && superCooldownCurrent < superCooldownMax) {
-                superCooldownCurrent++;
-            }
+  gameState.score += 10;
+  gameState.delivered += 1;
 
-            if (currentTurn === 1 && !gameOver) {
-                setTimeout(botTurn, 800);
-            }
-            updateHUD();
-        }
+  document.getElementById('score').textContent = gameState.score;
+  document.getElementById('delivered').textContent = gameState.delivered;
 
-        function botTurn() {
-            if (gameOver) return;
-            let bot = players[1];
-            let config = levelConfigs[currentLevelIdx];
-            let chosenWeapon = null;
+  showToast('+10 💰 Առաքվա՛ծ');
 
-            if (bot.weapons.length > 0) {
-                if (config.aiType === 'smart') {
-                    bot.weapons.sort((a, b) => b.damage - a.damage);
-                    chosenWeapon = bot.weapons[0];
-                } else {
-                    chosenWeapon = bot.weapons[Math.floor(Math.random() * bot.weapons.length)];
-                }
-                
-                let wIndex = bot.weapons.indexOf(chosenWeapon);
-                if (!chosenWeapon.infinite) {
-                    bot.weapons.splice(wIndex, 1);
-                }
-                launchProjectile(bot, players[0], chosenWeapon);
-            }
-            updateHUD();
-        }
+  // Նոր առաքելություն 800ms հետո
+  setTimeout(() => {
+    startNewMission();
+  }, 800);
+}
 
-        function checkGameOver() {
-            let nextBtn = document.getElementById("next-level-btn");
-            let retryBtn = document.getElementById("retry-level-btn");
+// ========== TOAST ==========
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
 
-            if (players[0].hp <= 0 && players[1].hp <= 0) {
-                gameOver = true;
-                nextBtn.style.display = "none";
-                retryBtn.style.display = "inline-block";
-                document.getElementById("overlay-title").innerText = "💀 ԵՐԿՈՒՍԴ ԷԼ ՊԱՐՏՎԵՑԻՔ (OVERKILL)!";
-                setTimeout(() => { document.getElementById("game-over-overlay").style.display = "flex"; }, 600);
-            } else if (players[1].hp <= 0) {
-                gameOver = true;
-                if (currentLevelIdx + 1 < levelConfigs.length) {
-                    levelConfigs[currentLevelIdx + 1].unlocked = true;
-                    nextBtn.style.display = "inline-block";
-                } else {
-                    nextBtn.style.display = "none";
-                }
-                retryBtn.style.display = "none";
-                document.getElementById("overlay-title").innerText = "🏆 ՄԱԿԱՐԴԱԿՆ ԱՆՑՎԱԾ Է!";
-                setTimeout(() => { document.getElementById("game-over-overlay").style.display = "flex"; }, 600);
-            } else if (players[0].hp <= 0) {
-                gameOver = true;
-                nextBtn.style.display = "none";
-                retryBtn.style.display = "inline-block";
-                document.getElementById("overlay-title").innerText = "💀 ՊԱՐՏՈՒԹՅՈՒՆ";
-                setTimeout(() => { document.getElementById("game-over-overlay").style.display = "flex"; }, 600);
-            }
-        }
+function showToast(text) {
+  toastEl.textContent = text;
+  toastEl.classList.add('show');
 
-        function retryLevel() {
-            document.getElementById("game-over-overlay").style.display = "none";
-            selectLevel(currentLevelIdx);
-        }
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toastEl.classList.remove('show');
+  }, 1200);
+}
 
-        function nextLevel() {
-            document.getElementById("game-over-overlay").style.display = "none";
-            if (currentLevelIdx + 1 < levelConfigs.length) {
-                selectLevel(currentLevelIdx + 1);
-            }
-        }
+// ========== MARKER ANIMATION ==========
+function animateMarkers(time) {
+  const markers = [missionState.pickupMarker, missionState.deliverMarker];
+  markers.forEach(m => {
+    if (!m || !m.visible) return;
 
-        function gameLoop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Պտտվող օղակ
+    if (m.userData.ring) {
+      m.userData.ring.rotation.z = time * 0.001;
+    }
 
-            let config = levelConfigs[currentLevelIdx];
-            let colors = config.bgColors;
+    // Վերև-ներքև շարժվող իկոն
+    if (m.userData.icon) {
+      m.userData.icon.position.y = 3 + Math.sin(time * 0.003) * 0.5;
+    }
 
-            let skyGrad = ctx.createLinearGradient(0, 0, 0, 540);
-            skyGrad.addColorStop(0, colors[0]);
-            skyGrad.addColorStop(1, colors[1]);
-            ctx.fillStyle = skyGrad;
-            ctx.fillRect(0, 0, canvas.width, 540);
+    // Թափանցիկության փոփոխություն
+    if (m.userData.beam) {
+      m.userData.beam.material.opacity = 0.25 + Math.sin(time * 0.002) * 0.15;
+    }
+  });
+}
 
-            let groundGrad = ctx.createLinearGradient(0, 540, 0, 700);
-            groundGrad.addColorStop(0, colors[2]);
-            groundGrad.addColorStop(1, colors[3]);
-            ctx.fillStyle = groundGrad;
-            ctx.fillRect(0, 540, canvas.width, 160);
+// ========== TIMER UPDATE (DOM THROTTLE) ==========
+const timerEl = document.getElementById('timer');
+let lastTimerText = '';
 
-            catapultAnim.releaseKick *= 0.85;
+function updateTimer() {
+  const elapsed = Math.floor((Date.now() - gameState.startTime) / 1000);
+  const minutes = Math.floor(elapsed / 60);
+  const seconds = elapsed % 60;
+  const text = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-            players.forEach(p => {
-                p.squashX += (1 - p.squashX) * 0.1;
-                p.squashY += (1 - p.squashY) * 0.1;
-            });
+  // ⚠️ Միայն թարմացնում ենք DOM-ը, երբ տեքստը փոխվում է
+  if (text !== lastTimerText) {
+    timerEl.textContent = text;
+    lastTimerText = text;
+  }
+}
 
-            drawDetailedBattlefield(players[0], true);
-            drawDetailedBattlefield(players[1], false);
+/* ============================================================
+   ՄԱՍ 8 — MINIMAP + HUD + DIRECTION ARROW (ՎԵՐՋՆԱԿԱՆ)
+   ============================================================ */
 
-            drawHpBar(players[0]);
-            drawHpBar(players[1]);
+// ============================================================
+// MINIMAP SETUP
+// ============================================================
 
-            if (flyingProjectile) {
-                flyingProjectile.progress += flyingProjectile.speed;
-                if (flyingProjectile.progress >= 1) {
-                    let proj = flyingProjectile;
-                    flyingProjectile = null;
-                    handleHit(proj);
-                } else {
-                    let currentX = flyingProjectile.startX + (flyingProjectile.targetX - flyingProjectile.startX) * flyingProjectile.progress;
-                    let heightCurve = Math.sin(flyingProjectile.progress * Math.PI) * 260;
-                    let currentY = flyingProjectile.startY - heightCurve;
-                    drawTexturedWeapon(ctx, flyingProjectile.type, currentX, currentY, 45, flyingProjectile.progress * Math.PI * 6);
-                }
-            }
+const minimapCanvas = document.getElementById('minimapCanvas');
+const minimapCtx = minimapCanvas.getContext('2d');
 
-            players.forEach(p => {
-                for (let i = p.hitPopups.length - 1; i >= 0; i--) {
-                    let pop = p.hitPopups[i];
-                    pop.yOffset -= 1.5; pop.alpha -= 0.02;
-                    ctx.save();
-                    ctx.font = "bold 22px 'Cinzel', serif";
-                    ctx.fillStyle = `rgba(239, 68, 68, ${pop.alpha})`;
-                    ctx.textAlign = "center";
-                    ctx.fillText(pop.text, p.castleX, 320 + pop.yOffset);
-                    ctx.restore();
-                    if (pop.alpha <= 0) p.hitPopups.splice(i, 1);
-                }
-            });
+const MINIMAP_SIZE = 200;
+const MINIMAP_RADIUS = MINIMAP_SIZE / 2;
 
-            for (let i = particles.length - 1; i >= 0; i--) {
-                let pt = particles[i];
-                pt.x += pt.vx; pt.y += pt.vy; pt.alpha -= pt.decay;
-                if (pt.alpha <= 0) particles.splice(i, 1);
-                else {
-                    ctx.fillStyle = pt.color; ctx.globalAlpha = pt.alpha;
-                    ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2); ctx.fill();
-                    ctx.globalAlpha = 1.0;
-                }
-            }
+// ⚠️ ՈՒՂՂՎԱԾ. 0.9-ը չափազանց մեծ էր, մարկերները դուրս էին ընկնում
+const MINIMAP_SCALE = 0.42;
 
-            // ⚡ FLASH LIGHTNING EFFECT (Invert colors quickly)
-            if (flashEffectTimer > 0) {
-                flashEffectTimer--;
-                ctx.save();
-                if (flashEffectTimer > 7) {
-                    ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.globalCompositeOperation = "difference";
-                    ctx.fillStyle = "#ffffff";
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                } else {
-                    ctx.fillStyle = "rgba(0, 0, 0, 0.95)";
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.globalCompositeOperation = "exclusion";
-                    ctx.fillStyle = "#ffffff";
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                }
-                ctx.restore();
-            }
+// ============================================================
+// DRAW MINIMAP
+// ============================================================
 
-            requestAnimationFrame(gameLoop);
-        }
+function drawMinimap() {
+  const ctx = minimapCtx;
+  const cx = MINIMAP_RADIUS;
+  const cy = MINIMAP_RADIUS;
 
-        function drawDetailedBattlefield(player, isHuman) {
-            let x = player.castleX;
-            ctx.save();
-            ctx.translate(x, 540);
-            ctx.scale(player.squashX * (isHuman ? 1 : -1), player.squashY);
+  // Clear
+  ctx.clearRect(0, 0, MINIMAP_SIZE, MINIMAP_SIZE);
 
-            ctx.fillStyle = "#334155"; ctx.fillRect(-100, -220, 140, 220);
-            ctx.fillStyle = "#1e293b"; ctx.fillRect(-80, -200, 100, 200);
-            ctx.fillStyle = "#475569";
-            for(let i = -100; i < 40; i += 35) ctx.fillRect(i, -240, 22, 20);
+  // ⚠️ ՄԻԱՅՆ ՄԵԿ save/restore ամբողջ գծելու համար
+  ctx.save();
 
-            ctx.save();
-            ctx.translate(-20, -220);
-            ctx.fillStyle = isHuman ? "#3b82f6" : "#dc2626"; ctx.fillRect(-12, -35, 24, 35);
-            ctx.fillStyle = "#94a3b8"; ctx.beginPath(); ctx.arc(0, -45, 12, 0, Math.PI * 2); ctx.fill();
-            ctx.restore();
+  // Clip շրջանակ
+  ctx.beginPath();
+  ctx.arc(cx, cy, MINIMAP_RADIUS - 2, 0, Math.PI * 2);
+  ctx.clip();
 
-            ctx.save();
-            let kickOffset = Math.sin(Date.now() * 0.02) * catapultAnim.releaseKick * 15;
-            ctx.translate(70 + kickOffset, 0);
-            ctx.strokeStyle = "#78350f"; ctx.lineWidth = 7;
-            ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(20, -60); ctx.lineTo(40, 0); ctx.stroke();
+  // Ֆոն
+  ctx.fillStyle = '#2a3a2a';
+  ctx.fillRect(0, 0, MINIMAP_SIZE, MINIMAP_SIZE);
 
-            if (isHuman && loadedWeapon) {
-                drawTexturedWeapon(ctx, loadedWeapon.id, -10, -85, 35, 0);
-            }
-            ctx.restore();
+  // World → Minimap coordinate helper
+  const px = player.position.x;
+  const pz = player.position.z;
 
-            ctx.restore();
-        }
+  function worldToMap(wx, wz) {
+    return {
+      x: cx + (wx - px) * MINIMAP_SCALE,
+      y: cy + (wz - pz) * MINIMAP_SCALE
+    };
+  }
 
-        function drawTexturedWeapon(ctx, type, x, y, size, angle) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(angle);
-            if (type === "fist") {
-                ctx.fillStyle = "#fca5a5"; ctx.beginPath(); ctx.arc(0, 0, size * 0.35, 0, Math.PI * 2); ctx.fill();
-            } else if (type === "rock") {
-                ctx.fillStyle = "#64748b"; ctx.beginPath(); ctx.roundRect(-size*0.4, -size*0.4, size*0.8, size*0.8, 6); ctx.fill();
-            } else if (type === "sword") {
-                ctx.fillStyle = "#cbd5e1"; ctx.fillRect(-size*0.1, -size*0.5, size*0.2, size);
-            } else if (type === "axe") {
-                ctx.fillStyle = "#78350f"; ctx.fillRect(-size*0.1, -size*0.4, size*0.2, size);
-                ctx.fillStyle = "#dc2626"; ctx.beginPath(); ctx.arc(0, -size*0.2, size*0.4, 0, Math.PI); ctx.fill();
-            }
-            ctx.restore();
-        }
+  // --- Streets ---
+  ctx.strokeStyle = '#555555';
+  ctx.lineWidth = 4;
+  STREETS.forEach(s => {
+    const p1 = worldToMap(s.x1, s.z1);
+    const p2 = worldToMap(s.x2, s.z2);
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+  });
 
-        function drawHpBar(player) {
-            let x = player.castleX;
-            ctx.save();
-            ctx.translate(x, 160);
-            ctx.fillStyle = "rgba(3, 5, 8, 0.85)";
-            ctx.beginPath(); ctx.roundRect(-70, 0, 140, 16, 8); ctx.fill();
-            let fillW = (player.hp / player.maxHp) * 136;
-            ctx.fillStyle = player.hp > 40 ? "#16a34a" : "#dc2626";
-            ctx.beginPath(); ctx.roundRect(-68, 2, Math.max(0, fillW), 12, 6); ctx.fill();
-            ctx.fillStyle = "#ffffff"; ctx.font = "bold 13px 'Cinzel', serif"; ctx.textAlign = "center";
-            ctx.fillText(`${player.name} (${player.hp} HP)`, 0, -8);
-            ctx.restore();
-        }
+  // --- Buildings ---
+  ctx.fillStyle = '#8a7a5a';
+  buildings.forEach(b => {
+    const p1 = worldToMap(b.minX, b.minZ);
+    const p2 = worldToMap(b.maxX, b.maxZ);
+    ctx.fillRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+  });
 
-        function updateHUD() {
-            let tray = document.getElementById("ground-weapons-tray");
-            tray.innerHTML = "";
-            players[0].weapons.forEach((w, index) => {
-                let btn = document.createElement("button");
-                btn.className = "ground-weapon-card";
-                btn.innerHTML = `<div style="font-weight:700; font-size:12px;">${w.name}</div><div style="font-size:11px; color:#94a3b8;">⚔️ ${w.damage}</div>`;
-                btn.onclick = () => selectWeaponFromGround(index);
-                if (currentTurn !== 0 || flyingProjectile || gameOver) btn.disabled = true;
-                tray.appendChild(btn);
-            });
+  // --- Landmarks ---
+  ctx.fillStyle = '#a89878';
+  landmarks.forEach(b => {
+    const p1 = worldToMap(b.minX, b.minZ);
+    const p2 = worldToMap(b.maxX, b.maxZ);
+    ctx.fillRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+  });
 
-            let enemyList = document.getElementById("enemy-weapons-list");
-            enemyList.innerHTML = players[1].weapons.map(w => `• ${w.name} (${w.damage} Dmg)`).join("<br>");
+  // --- Mission markers ---
+  if (missionState.phase === 'pickup' && missionState.pickupPoint) {
+    const p = worldToMap(missionState.pickupPoint.x, missionState.pickupPoint.z);
+    drawMarkerDot(ctx, p.x, p.y, '#4facfe', 6);
+  }
+  if (missionState.phase === 'deliver' && missionState.deliverPoint) {
+    const p = worldToMap(missionState.deliverPoint.x, missionState.deliverPoint.z);
+    drawMarkerDot(ctx, p.x, p.y, '#f5576c', 6);
+  }
 
-            let indicator = document.getElementById("turn-indicator");
-            if (!gameOver) {
-                indicator.innerText = currentTurn === 0 ? "✨ Ձեր հերթն է" : "⚔️ Հակառակորդի հերթն է...";
-            }
+  // --- Player arrow (minimap-ի կենտրոնում) ---
+  //
+  // ⚠️ ՈՒՂՂՎԱԾ ՍԼԱՔԻ ԲԱՆԱՁԵՎԸ.
+  //
+  // Սլաքը նկարվում է (0,-8) գլխով → ուղղված է վերև (-Y)։
+  // Canvas-ի rotate(θ) պտտում է ԺԱՄԱՑՈՒՅՑԻ ՈՒՂՂՈՒԹՅԱՄԲ։
+  //
+  // heading = 0 → forward = +Z → minimap-ում ներքև → rotate(π)
+  // heading = π/2 → forward = +X → minimap-ում աջ → rotate(π/2)
+  // heading = π → forward = -Z → minimap-ում վերև → rotate(0)
+  // heading = -π/2 → forward = -X → minimap-ում ձախ → rotate(-π/2)
+  //
+  // Բանաձև. rotate = π - heading ✅
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(Math.PI - playerState.heading);
 
-            // ⚡ SUPER ABILITY HUD UPDATE
-            let superBtn = document.getElementById("super-ability-btn");
-            if (superBtn) {
-                if (currentLevelIdx >= 2) { // Level 3-ից սկսած (index 2)
-                    superBtn.style.display = "inline-block";
-                    if (superCooldownCurrent >= superCooldownMax) {
-                        superBtn.disabled = (currentTurn !== 0 || flyingProjectile || gameOver);
-                        superBtn.innerText = "⚡ ԷՆԵՐԳԵՏԻԿ ԿԱՅԾԱԿ (100%)";
-                        superBtn.style.background = "linear-gradient(180deg, #2563eb, #1d4ed8)";
-                    } else {
-                        superBtn.disabled = true;
-                        let percent = Math.floor((superCooldownCurrent / superCooldownMax) * 100);
-                        superBtn.innerText = `⏳ Լիցքավորում... (${percent}%)`;
-                        superBtn.style.background = "#334155";
-                    }
-                } else {
-                    superBtn.style.display = "none";
-                }
-            }
-        }
-    </script>
+  ctx.fillStyle = '#ffd166';
+  ctx.beginPath();
+  ctx.moveTo(0, -8);
+  ctx.lineTo(-6, 6);
+  ctx.lineTo(0, 3);
+  ctx.lineTo(6, 6);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.restore();
+
+  // --- North indicator (ՆԵՐՍԸ clip-ի) ---
+  ctx.fillStyle = '#ffd166';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('N', cx, 14);
+
+  // ⚠️ ՄԻԱՅՆ ՄԵԿ restore ամբողջ ֆունկցիայի համար
+  ctx.restore();
+
+  // --- Border ring (clip-ից դուրս, որպեսզի եզրը մաքուր լինի) ---
+  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(cx, cy, MINIMAP_RADIUS - 3, 0, Math.PI * 2);
+  ctx.stroke();
+}
+
+// ============================================================
+// MARKER DOT HELPER
+// ============================================================
+
+function drawMarkerDot(ctx, x, y, color, radius) {
+  // Արտաքին շող
+  ctx.beginPath();
+  ctx.arc(x, y, radius + 3, 0, Math.PI * 2);
+  ctx.fillStyle = color + '44';
+  ctx.fill();
+
+  // Հիմնական կետ
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+
+  // Սահման
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+// ============================================================
+// HUD UPDATE
+// ============================================================
+
+function updateHUD() {
+  updateSpeedDisplay();
+  updateTimer();
+}
+
+// ============================================================
+// DIRECTION ARROW (դեպի թիրախ)
+// ============================================================
+
+// ⚠️ Սլաքը արդեն գոյություն ունի DOM-ում (<div id="directionArrow">)
+const arrowEl = document.getElementById('directionArrow');
+let lastArrowTransform = '';
+let lastArrowOpacity = '';
+
+function updateDirectionArrow() {
+  let target = null;
+  if (missionState.phase === 'pickup' && missionState.pickupPoint) {
+    target = missionState.pickupPoint;
+  } else if (missionState.phase === 'deliver' && missionState.deliverPoint) {
+    target = missionState.deliverPoint;
+  }
+
+  if (!target) {
+    if (lastArrowOpacity !== '0') {
+      arrowEl.style.opacity = '0';
+      lastArrowOpacity = '0';
+    }
+    return;
+  }
+
+  const dx = target.x - player.position.x;
+  const dz = target.z - player.position.z;
+  const dist = Math.sqrt(dx * dx + dz * dz);
+
+  // Եթե շատ մոտ ենք, թաքցնում ենք
+  if (dist < 6) {
+    if (lastArrowOpacity !== '0') {
+      arrowEl.style.opacity = '0';
+      lastArrowOpacity = '0';
+    }
+    return;
+  }
+
+  // ⚠️ ՈՒՂՂՎԱԾ ԱՆԿՅՈՒՆԸ.
+  //
+  // heading = 0 → forward = +Z
+  // angleToTarget = atan2(dx, dz)
+  //   heading = 0 → target +Z-ում → angleToTarget = 0
+  //   heading = π/2 → target +X-ում → angleToTarget = π/2
+  //
+  // relativeAngle = angleToTarget - heading
+  //   Սա ցույց է տալիս, թե քանի՞ աստիճանով պետք է պտտվել մեքենան, որ ուղղվի դեպի թիրախը։
+  //
+  // Էկրանի վրա 0 = վերև, + = ժամացույցի ուղղությամբ։
+  // Սլաքը rotate(0) → վերև է։
+  //
+  // Ուստի. screenAngle = relativeAngle
+  const angleToTarget = Math.atan2(dx, dz);
+  const relativeAngle = angleToTarget - playerState.heading;
+  const screenAngle = relativeAngle;
+
+  const radius = 120;
+  const ax = Math.sin(screenAngle) * radius;
+  const ay = -Math.cos(screenAngle) * radius;
+
+  const transform = `translate(calc(-50% + ${ax.toFixed(1)}px), calc(-50% + ${ay.toFixed(1)}px)) rotate(${screenAngle.toFixed(3)}rad)`;
+
+  if (transform !== lastArrowTransform) {
+    arrowEl.style.transform = transform;
+    lastArrowTransform = transform;
+  }
+  if (lastArrowOpacity !== '0.85') {
+    arrowEl.style.opacity = '0.85';
+    lastArrowOpacity = '0.85';
+  }
+}
+
+// ============================================================
+// DISTANCE TO TARGET (DOM THROTTLE)
+// ============================================================
+
+let lastMissionDistText = '';
+
+function updateMissionDistance() {
+  let target = null;
+  if (missionState.phase === 'pickup' && missionState.pickupPoint) {
+    target = missionState.pickupPoint;
+  } else if (missionState.phase === 'deliver' && missionState.deliverPoint) {
+    target = missionState.deliverPoint;
+  }
+  if (!target) return;
+
+  const dx = target.x - player.position.x;
+  const dz = target.z - player.position.z;
+  const dist = Math.round(Math.sqrt(dx * dx + dz * dz));
+
+  const baseText = missionState.phase === 'pickup'
+    ? '📍 Գնա՛ պատվերի կետ'
+    : '📦 Հասցրու՛ հաճախորդին';
+
+  const text = `${baseText} — ${dist}մ`;
+
+  // ⚠️ Միայն թարմացնում ենք DOM-ը, երբ տեքստը փոխվում է
+  if (text !== lastMissionDistText) {
+    missionEl.textContent = text;
+    lastMissionDistText = text;
+  }
+}
+/* ============================================================
+   ՄԱՍ 9 — GAME LOOP + FINAL WIRING (ՎԵՐՋՆԱԿԱՆ + MOBILE)
+   ============================================================ */
+
+// ========== CLOCK ==========
+const clock = new THREE.Clock();
+
+// ========== GAME LOOP ==========
+let animationId = null;
+let minimapAccumulator = 0;
+const MINIMAP_INTERVAL = 1 / 30;
+
+function gameLoop() {
+  animationId = requestAnimationFrame(gameLoop);
+
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const time = performance.now();
+
+  if (gameState.running) {
+    updatePhysics(dt);
+    checkMissionProgress();
+  }
+
+  updateCamera(dt);
+  animateMarkers(time);
+  updateHUD();
+  updateDirectionArrow();
+  updateMissionDistance();
+
+  renderer.render(scene, camera);
+
+  minimapAccumulator += dt;
+  if (minimapAccumulator >= MINIMAP_INTERVAL) {
+    minimapAccumulator = 0;
+    drawMinimap();
+  }
+
+  if (DEBUG) updateFPS();
+}
+
+// ========== CAMERA INITIAL PLACEMENT ==========
+function placeCameraBehindPlayer() {
+  const h = playerState.heading;
+  const forwardX = Math.sin(h);
+  const forwardZ = Math.cos(h);
+
+  camera.position.set(
+    player.position.x - forwardX * CAM_DISTANCE,
+    player.position.y + CAM_HEIGHT,
+    player.position.z - forwardZ * CAM_DISTANCE
+  );
+  camLookAt.set(
+    player.position.x + forwardX * CAM_LOOK_AHEAD,
+    player.position.y + 1.5,
+    player.position.z + forwardZ * CAM_LOOK_AHEAD
+  );
+  camera.lookAt(camLookAt);
+  camInitialized = true;
+}
+
+// ========== RESET HUD THROTTLE FLAGS ==========
+function resetHudThrottle() {
+  lastSpeedKmh = -1;
+  lastTimerText = '';
+  lastMissionDistText = '';
+  lastArrowTransform = '';
+  lastArrowOpacity = '';
+}
+
+// ========== START GAME ==========
+function startGame() {
+  const startScreen = document.getElementById('startScreen');
+  startScreen.classList.add('hide');
+
+  gameState.running = true;
+  gameState.startTime = Date.now();
+  gameState.score = 0;
+  gameState.delivered = 0;
+
+  player.position.set(0, 0, 20);
+  playerState.speed = 0;
+  playerState.heading = 0;
+  playerState.angularVelocity = 0;
+  playerState.drift = 0;
+
+  camInitialized = false;
+  resetHudThrottle();
+
+  document.getElementById('score').textContent = '0';
+  document.getElementById('delivered').textContent = '0';
+  document.getElementById('timer').textContent = '0:00';
+
+  placeCameraBehindPlayer();
+  startNewMission();
+  showToast('🛵 Բարի գալուստ Երևան');
+
+  if (!animationId) {
+    clock.start();
+    gameLoop();
+  }
+}
+
+// ========== START BUTTON ==========
+const startBtn = document.getElementById('startBtn');
+startBtn.addEventListener('click', startGame);
+
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Enter' && !gameState.running) {
+    startGame();
+  }
+});
+
+// ========== INITIAL RENDER ==========
+placeCameraBehindPlayer();
+renderer.render(scene, camera);
+
+clock.start();
+gameLoop();
+
+// ========== FPS COUNTER (DEBUG) ==========
+let fpsFrames = 0;
+let fpsLastTime = performance.now();
+
+function updateFPS() {
+  fpsFrames++;
+  const now = performance.now();
+  if (now - fpsLastTime >= 1000) {
+    console.log('FPS:', fpsFrames);
+    fpsFrames = 0;
+    fpsLastTime = now;
+  }
+}
+
+// ========== CLEANUP ==========
+window.addEventListener('beforeunload', () => {
+  if (animationId) cancelAnimationFrame(animationId);
+});
+
+// ========== WELCOME LOG (DEBUG) ==========
+if (DEBUG) {
+  console.log('%c🛵 Երևանյան Առաքիչ', 'font-size: 24px; font-weight: 900; color: #ff6b35;');
+  console.log('%cPrototype v1.0 — Chase Camera', 'font-size: 14px; color: #ffd166;');
+  console.log('%cՕգտագործիր WASD կամ սլաքները քշելու համար', 'font-size: 12px; color: #888;');
+}
+
+// ============================================================
+// MOBILE TOUCH CONTROLS
+// ============================================================
+
+// ========== JOYSTICK ==========
+const joystickZone = document.getElementById('joystickZone');
+const joystickBase = document.getElementById('joystickBase');
+const joystickKnob = document.getElementById('joystickKnob');
+
+let joystickActive = false;
+let joystickTouchId = null;
+let joystickCenterX = 0;
+let joystickCenterY = 0;
+const JOYSTICK_RADIUS = 60;
+const DEAD_ZONE = 0.25;
+
+function getJoystickCenter() {
+  if (!joystickBase) return;
+  const rect = joystickBase.getBoundingClientRect();
+  joystickCenterX = rect.left + rect.width / 2;
+  joystickCenterY = rect.top + rect.height / 2;
+}
+
+function handleJoystickStart(e) {
+  if (joystickActive || !joystickBase) return;
+  const touch = e.changedTouches[0];
+  joystickTouchId = touch.identifier;
+  joystickActive = true;
+  getJoystickCenter();
+  handleJoystickMove(e);
+}
+
+function handleJoystickMove(e) {
+  if (!joystickActive) return;
+  let touch = null;
+  for (const t of e.changedTouches) {
+    if (t.identifier === joystickTouchId) {
+      touch = t;
+      break;
+    }
+  }
+  if (!touch) return;
+
+  let dx = touch.clientX - joystickCenterX;
+  let dy = touch.clientY - joystickCenterY;
+
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist > JOYSTICK_RADIUS) {
+    dx = (dx / dist) * JOYSTICK_RADIUS;
+    dy = (dy / dist) * JOYSTICK_RADIUS;
+  }
+
+  if (joystickKnob) {
+    joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+  }
+
+  const nx = dx / JOYSTICK_RADIUS;
+  const ny = dy / JOYSTICK_RADIUS;
+
+  if (nx < -DEAD_ZONE) {
+    keys['KeyA'] = true;
+    keys['KeyD'] = false;
+  } else if (nx > DEAD_ZONE) {
+    keys['KeyD'] = true;
+    keys['KeyA'] = false;
+  } else {
+    keys['KeyA'] = false;
+    keys['KeyD'] = false;
+  }
+
+  if (ny < -DEAD_ZONE) {
+    keys['KeyW'] = true;
+    keys['KeyS'] = false;
+  } else if (ny > DEAD_ZONE) {
+    keys['KeyS'] = true;
+    keys['KeyW'] = false;
+  } else {
+    keys['KeyW'] = false;
+    keys['KeyS'] = false;
+  }
+}
+
+function handleJoystickEnd(e) {
+  if (!joystickActive) return;
+  let found = false;
+  for (const t of e.changedTouches) {
+    if (t.identifier === joystickTouchId) {
+      found = true;
+      break;
+    }
+  }
+  if (!found) return;
+
+  joystickActive = false;
+  joystickTouchId = null;
+
+  if (joystickKnob) {
+    joystickKnob.style.transform = 'translate(0px, 0px)';
+  }
+
+  keys['KeyA'] = false;
+  keys['KeyD'] = false;
+  keys['KeyW'] = false;
+  keys['KeyS'] = false;
+}
+
+if (joystickZone) {
+  joystickZone.addEventListener('touchstart', handleJoystickStart, { passive: false });
+  joystickZone.addEventListener('touchmove', handleJoystickMove, { passive: false });
+  joystickZone.addEventListener('touchend', handleJoystickEnd, { passive: false });
+  joystickZone.addEventListener('touchcancel', handleJoystickEnd, { passive: false });
+}
+
+// ========== ACTION BUTTONS ==========
+function bindTouchButton(btnId, keyCode) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+
+  btn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    keys[keyCode] = true;
+    btn.classList.add('pressed');
+  }, { passive: false });
+
+  btn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    keys[keyCode] = false;
+    btn.classList.remove('pressed');
+  }, { passive: false });
+
+  btn.addEventListener('touchcancel', () => {
+    keys[keyCode] = false;
+    btn.classList.remove('pressed');
+  }, { passive: false });
+
+  btn.addEventListener('mousedown', () => {
+    keys[keyCode] = true;
+    btn.classList.add('pressed');
+  });
+  btn.addEventListener('mouseup', () => {
+    keys[keyCode] = false;
+    btn.classList.remove('pressed');
+  });
+  btn.addEventListener('mouseleave', () => {
+    keys[keyCode] = false;
+    btn.classList.remove('pressed');
+  });
+}
+
+bindTouchButton('btnAccel', 'KeyW');
+bindTouchButton('btnBrake', 'KeyS');
+bindTouchButton('btnHandbrake', 'Space');
+
+// ========== PREVENT SCROLL & ZOOM ==========
+document.addEventListener('touchmove', (e) => {
+  if (!e.target.closest('#mobileControls')) {
+    e.preventDefault();
+  }
+}, { passive: false });
+
+let lastTouchEnd = 0;
+document.addEventListener('touchend', (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) {
+    e.preventDefault();
+  }
+  lastTouchEnd = now;
+}, false);
+
+/* ============================================================
+   ՎԵՐՋ 🎉
+   ============================================================ */
+</script>
 </body>
 </html>

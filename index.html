@@ -1130,29 +1130,533 @@ BLOCK_X.forEach(bx => {
     new THREE.MeshStandardMaterial({ color: 0xd9bfa3, roughness: 0.85 })
   );
   base.position.set(x, 4, z);
+
+ /* ============================================================
+   ՄԱՍ 4 — BUILDINGS + LANDMARKS (ԵՐԵՎԱՆԻ ԴԱՍԱՎՈՐՈՒԹՅԱՄԲ)
+   ============================================================ */
+
+// ========== COLLISION ARRAYS ==========
+const buildings = [];
+const landmarks = [];
+
+// ========== COLORS ==========
+const buildingColors = [
+  0xd4a373, 0xccd5ae, 0xe9edc9, 0xfaedcd,
+  0xb08968, 0xa68a6d, 0xc9ada7, 0xe8d5b7,
+  0xd9bfa3, 0xc4a484, 0xbfa980, 0xe6d5b8
+];
+
+const roofColors = [0x8b5a3c, 0x6b4423, 0x7a5c3f, 0x5c4033];
+
+// ========== BUILDING FACTORY ==========
+function addBuilding(x, z, w, d, h) {
+  if (w <= 0 || d <= 0 || h <= 0) return;
+
+  const color = buildingColors[Math.floor(Math.random() * buildingColors.length)];
+  const roofColor = roofColors[Math.floor(Math.random() * roofColors.length)];
+
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(w, h, d),
+    new THREE.MeshStandardMaterial({ color, roughness: 0.9 })
+  );
+  body.position.set(x, h / 2, z);
+  body.castShadow = true;
+  body.receiveShadow = true;
+  scene.add(body);
+
+  const roof = new THREE.Mesh(
+    new THREE.BoxGeometry(w + 0.6, 0.5, d + 0.6),
+    new THREE.MeshStandardMaterial({ color: roofColor, roughness: 0.85 })
+  );
+  roof.position.set(x, h + 0.25, z);
+  roof.castShadow = true;
+  scene.add(roof);
+
+  // Պատուհաններ
+  const winMat = new THREE.MeshStandardMaterial({
+    color: 0x88ccff, emissive: 0x224466, emissiveIntensity: 0.5,
+    roughness: 0.2, metalness: 0.3
+  });
+
+  const winW = 1.2, winH = 1.6, gapX = 2.8, gapY = 3.2;
+  const rows = Math.max(0, Math.floor((h - 2) / gapY));
+  const colsX = Math.max(0, Math.floor((w - 2) / gapX));
+  const colsZ = Math.max(0, Math.floor((d - 2) / gapX));
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < colsX; c++) {
+      const wx = x - w / 2 + 1.5 + c * gapX;
+      const wy = 2.5 + r * gapY;
+
+      const winF = new THREE.Mesh(new THREE.BoxGeometry(winW, winH, 0.1), winMat);
+      winF.position.set(wx, wy, z + d / 2 + 0.06);
+      scene.add(winF);
+
+      const winB = new THREE.Mesh(new THREE.BoxGeometry(winW, winH, 0.1), winMat);
+      winB.position.set(wx, wy, z - d / 2 - 0.06);
+      scene.add(winB);
+    }
+  }
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < colsZ; c++) {
+      const wz = z - d / 2 + 1.5 + c * gapX;
+      const wy = 2.5 + r * gapY;
+
+      const winL = new THREE.Mesh(new THREE.BoxGeometry(0.1, winH, winW), winMat);
+      winL.position.set(x - w / 2 - 0.06, wy, wz);
+      scene.add(winL);
+
+      const winR = new THREE.Mesh(new THREE.BoxGeometry(0.1, winH, winW), winMat);
+      winR.position.set(x + w / 2 + 0.06, wy, wz);
+      scene.add(winR);
+    }
+  }
+
+  buildings.push({
+    minX: x - w / 2, maxX: x + w / 2,
+    minZ: z - d / 2, maxZ: z + d / 2
+  });
+}
+
+// ============================================================
+// 1. ԿԱՍԿԱԴ (Cascades) — վերին աջ
+// ============================================================
+(function addCascade() {
+  const baseX = 40;
+  const baseZ = -60;
+  const steps = 6;
+  const stepMat = new THREE.MeshStandardMaterial({ color: 0xf5e6d3, roughness: 0.8 });
+  const railMat = new THREE.MeshStandardMaterial({ color: 0xd4c4a8, roughness: 0.7 });
+
+  for (let i = 0; i < steps; i++) {
+    const stepW = 20 - i * 2;
+    const stepH = 2.5;
+    const stepD = 3;
+
+    const step = new THREE.Mesh(
+      new THREE.BoxGeometry(stepW, stepH, stepD),
+      stepMat
+    );
+    step.position.set(baseX, stepH / 2 + i * stepH, baseZ + i * stepD);
+    step.castShadow = true;
+    step.receiveShadow = true;
+    scene.add(step);
+
+    landmarks.push({
+      minX: baseX - stepW / 2, maxX: baseX + stepW / 2,
+      minZ: baseZ + i * stepD - stepD / 2, maxZ: baseZ + i * stepD + stepD / 2
+    });
+
+    const railL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.2, stepD), railMat);
+    railL.position.set(baseX - stepW / 2 + 0.3, stepH + i * stepH + 0.6, baseZ + i * stepD);
+    railL.castShadow = true;
+    scene.add(railL);
+
+    const railR = railL.clone();
+    railR.position.x = baseX + stepW / 2 - 0.3;
+    scene.add(railR);
+  }
+
+  // Հուշարձան գագաթին
+  const monument = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.8, 1.2, 8, 8),
+    new THREE.MeshStandardMaterial({ color: 0xc4a484 })
+  );
+  monument.position.set(baseX, 23, baseZ + 15);
+  monument.castShadow = true;
+  scene.add(monument);
+})();
+
+// ============================================================
+// 2. ՄԱՏԵՆԱԴԱՐԱՆ — վերին ձախ
+// ============================================================
+(function addMatenadaran() {
+  const x = -60;
+  const z = -50;
+
+  const base = new THREE.Mesh(
+    new THREE.BoxGeometry(20, 10, 16),
+    new THREE.MeshStandardMaterial({ color: 0xd9bfa3, roughness: 0.85 })
+  );
+  base.position.set(x, 5, z);
   base.castShadow = true;
   base.receiveShadow = true;
   scene.add(base);
 
+  // Սյուներ
   const colMat = new THREE.MeshStandardMaterial({ color: 0xf5e6d3, roughness: 0.7 });
   for (let i = 0; i < 6; i++) {
     const col = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.5, 0.5, 8, 12),
+      new THREE.CylinderGeometry(0.6, 0.6, 9, 12),
       colMat
     );
-    col.position.set(x - 7 + i * 2.8, 4, z + 8);
+    col.position.set(x - 8 + i * 3.2, 4.5, z + 9);
     col.castShadow = true;
     scene.add(col);
   }
 
-  // ✅ Ճշգրիտ collider (միայն հիմնական մասը, սյուները բաց են)
+  // Աստիճաններ
+  for (let i = 0; i < 4; i++) {
+    const step = new THREE.Mesh(
+      new THREE.BoxGeometry(20, 0.4, 1),
+      new THREE.MeshStandardMaterial({ color: 0xcccccc })
+    );
+    step.position.set(x, 0.2 + i * 0.4, z + 10 + i);
+    scene.add(step);
+  }
+
   landmarks.push({
-    minX: x - 9,
-    maxX: x + 9,
-    minZ: z - 7,
-    maxZ: z + 7
+    minX: x - 10, maxX: x + 10,
+    minZ: z - 8, maxZ: z + 10
   });
 })();
+
+// ============================================================
+// 3. ՕՊԵՐԱ (Opera House) — ձախ
+// ============================================================
+(function addOpera() {
+  const x = -40;
+  const z = -10;
+
+  const base = new THREE.Mesh(
+    new THREE.CylinderGeometry(12, 12, 4, 32),
+    new THREE.MeshStandardMaterial({ color: 0xe8d5b7, roughness: 0.8 })
+  );
+  base.position.set(x, 2, z);
+  base.castShadow = true;
+  base.receiveShadow = true;
+  scene.add(base);
+
+  const dome = new THREE.Mesh(
+    new THREE.SphereGeometry(12, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+    new THREE.MeshStandardMaterial({ color: 0xc4a484, roughness: 0.7 })
+  );
+  dome.position.set(x, 4, z);
+  dome.castShadow = true;
+  scene.add(dome);
+
+  // Մուտքի կամար
+  const arch = new THREE.Mesh(
+    new THREE.BoxGeometry(6, 8, 2),
+    new THREE.MeshStandardMaterial({ color: 0xf5e6d3 })
+  );
+  arch.position.set(x, 4, z + 12);
+  scene.add(arch);
+
+  landmarks.push({
+    minX: x - 12, maxX: x + 12,
+    minZ: z - 12, maxZ: z + 12
+  });
+})();
+
+// ============================================================
+// 4. ՀԱՆՐԱՊԵՏՈՒԹՅԱՆ ՀՐԱՊԱՐԱԿ — կենտրոն
+// ============================================================
+(function addRepublicSquare() {
+  const x = 0, z = 0;
+
+  // Հրապարակի հատակ
+  const plaza = new THREE.Mesh(
+    new THREE.BoxGeometry(60, 0.2, 60),
+    new THREE.MeshStandardMaterial({ color: 0xd4c4a8 })
+  );
+  plaza.position.set(x, 0.1, z);
+  plaza.receiveShadow = true;
+  scene.add(plaza);
+
+  // Շատրվան
+  const fountainBase = new THREE.Mesh(
+    new THREE.CylinderGeometry(8, 8, 0.8, 32),
+    new THREE.MeshStandardMaterial({ color: 0xcccccc })
+  );
+  fountainBase.position.set(x, 0.5, z);
+  fountainBase.receiveShadow = true;
+  scene.add(fountainBase);
+
+  const water = new THREE.Mesh(
+    new THREE.CylinderGeometry(7.5, 7.5, 0.2, 32),
+    new THREE.MeshStandardMaterial({
+      color: 0x4facfe, transparent: true, opacity: 0.7, roughness: 0.1
+    })
+  );
+  water.position.set(x, 0.9, z);
+  scene.add(water);
+
+  const pillar = new THREE.Mesh(
+    new THREE.CylinderGeometry(1, 1.5, 4, 16),
+    new THREE.MeshStandardMaterial({ color: 0xdddddd })
+  );
+  pillar.position.set(x, 3, z);
+  pillar.castShadow = true;
+  scene.add(pillar);
+
+  const top = new THREE.Mesh(
+    new THREE.SphereGeometry(1.2, 16, 16),
+    new THREE.MeshStandardMaterial({ color: 0xffd166, metalness: 0.8 })
+  );
+  top.position.set(x, 5.5, z);
+  scene.add(top);
+
+  // Շենքեր հրապարակի շուրջ
+  addBuilding(-20, -20, 14, 14, 18);
+  addBuilding(20, -20, 14, 14, 18);
+  addBuilding(-20, 20, 14, 14, 18);
+  addBuilding(20, 20, 14, 14, 18);
+})();
+
+// ============================================================
+// 5. ԱԶԳԱՅԻՆ ՊԱՏԿԵՐԱՍՐԱՀ — ձախ
+// ============================================================
+(function addGallery() {
+  const x = -50;
+  const z = 20;
+
+  const base = new THREE.Mesh(
+    new THREE.BoxGeometry(22, 12, 16),
+    new THREE.MeshStandardMaterial({ color: 0xd4a373, roughness: 0.85 })
+  );
+  base.position.set(x, 6, z);
+  base.castShadow = true;
+  base.receiveShadow = true;
+  scene.add(base);
+
+  // Սյուներ
+  const colMat = new THREE.MeshStandardMaterial({ color: 0xf5e6d3 });
+  for (let i = 0; i < 4; i++) {
+    const col = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.7, 0.7, 11, 12),
+      colMat
+    );
+    col.position.set(x - 6 + i * 4, 5.5, z + 8);
+    scene.add(col);
+  }
+
+  // Տանիք
+  const roof = new THREE.Mesh(
+    new THREE.BoxGeometry(23, 0.8, 17),
+    new THREE.MeshStandardMaterial({ color: 0x8b5a3c })
+  );
+  roof.position.set(x, 12.5, z);
+  scene.add(roof);
+
+  landmarks.push({
+    minX: x - 11, maxX: x + 11,
+    minZ: z - 8, maxZ: z + 8
+  });
+})();
+
+// ============================================================
+// 6. MARRIOTT HOTEL — ներքև
+// ============================================================
+(function addMarriott() {
+  const x = 0;
+  const z = 50;
+
+  const base = new THREE.Mesh(
+    new THREE.BoxGeometry(30, 25, 20),
+    new THREE.MeshStandardMaterial({ color: 0xe8d5b7, roughness: 0.85 })
+  );
+  base.position.set(x, 12.5, z);
+  base.castShadow = true;
+  base.receiveShadow = true;
+  scene.add(base);
+
+  // Տանիք
+  const roof = new THREE.Mesh(
+    new THREE.BoxGeometry(31, 1, 21),
+    new THREE.MeshStandardMaterial({ color: 0x8b5a3c })
+  );
+  roof.position.set(x, 25.5, z);
+  scene.add(roof);
+
+  // Մուտք
+  const entrance = new THREE.Mesh(
+    new THREE.BoxGeometry(6, 6, 0.5),
+    new THREE.MeshStandardMaterial({ color: 0x4a90e2 })
+  );
+  entrance.position.set(x, 3, z - 10.5);
+  scene.add(entrance);
+
+  // Հովանոց
+  const canopy = new THREE.Mesh(
+    new THREE.BoxGeometry(12, 0.5, 4),
+    new THREE.MeshStandardMaterial({ color: 0xffd166 })
+  );
+  canopy.position.set(x, 6.5, z - 12);
+  scene.add(canopy);
+
+  landmarks.push({
+    minX: x - 15, maxX: x + 15,
+    minZ: z - 10, maxZ: z + 10
+  });
+})();
+
+// ============================================================
+// 7. ՀԱՄԱԼՍԱՐԱՆ — ներքև աջ
+// ============================================================
+(function addUniversity() {
+  const x = 50;
+  const z = 50;
+
+  const base = new THREE.Mesh(
+    new THREE.BoxGeometry(28, 18, 22),
+    new THREE.MeshStandardMaterial({ color: 0xf5e6d3, roughness: 0.85 })
+  );
+  base.position.set(x, 9, z);
+  base.castShadow = true;
+  base.receiveShadow = true;
+  scene.add(base);
+
+  // Սյուներ
+  const colMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+  for (let i = 0; i < 6; i++) {
+    const col = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.6, 0.7, 17, 12),
+      colMat
+    );
+    col.position.set(x - 10 + i * 4, 8.5, z + 12);
+    col.castShadow = true;
+    scene.add(col);
+  }
+
+  // Աստիճաններ
+  for (let i = 0; i < 5; i++) {
+    const step = new THREE.Mesh(
+      new THREE.BoxGeometry(28, 0.4, 1),
+      new THREE.MeshStandardMaterial({ color: 0xcccccc })
+    );
+    step.position.set(x, 0.2 + i * 0.4, z + 13 + i);
+    scene.add(step);
+  }
+
+  // Հետևի մուտք
+  const backDoor = new THREE.Mesh(
+    new THREE.BoxGeometry(2, 3, 0.3),
+    new THREE.MeshStandardMaterial({ color: 0x6b4423 })
+  );
+  backDoor.position.set(x + 12, 1.5, z - 11.2);
+  scene.add(backDoor);
+
+  // Դրոշ
+  const flagPole = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.1, 0.1, 10, 8),
+    new THREE.MeshStandardMaterial({ color: 0x888888 })
+  );
+  flagPole.position.set(x, 5, z + 12);
+  scene.add(flagPole);
+
+  landmarks.push({
+    minX: x - 14, maxX: x + 14,
+    minZ: z - 11, maxZ: z + 11
+  });
+})();
+
+// ============================================================
+// 8. ՀՅՈՒՍԻՍԱՅԻՆ ՊՈՂՈՏԱ — աջ
+// ============================================================
+(function addNorthernAvenue() {
+  const x = 30;
+  const z = -10;
+
+  // Շենքեր երկու կողմից
+  for (let i = 0; i < 8; i++) {
+    const bz = z - 30 + i * 8;
+    addBuilding(x - 6, bz, 8, 6, 10 + Math.random() * 5);
+    addBuilding(x + 6, bz, 8, 6, 10 + Math.random() * 5);
+  }
+
+  // Փողոցի հատակ
+  const road = new THREE.Mesh(
+    new THREE.BoxGeometry(8, 0.05, 70),
+    new THREE.MeshStandardMaterial({ color: 0x3a3a3a })
+  );
+  road.position.set(x, 0.03, z);
+  road.receiveShadow = true;
+  scene.add(road);
+})();
+
+// ============================================================
+// ՀԵՏԻՆ ՓՈՂՈՑՆԵՐ (միացնող)
+// ============================================================
+
+// Կենտրոնական հորիզոնական պողոտա (Աբովյան)
+(function addMainAvenue() {
+  const road = new THREE.Mesh(
+    new THREE.BoxGeometry(200, 0.05, 14),
+    new THREE.MeshStandardMaterial({ color: 0x353535 })
+  );
+  road.position.set(0, 0.03, -5);
+  road.receiveShadow = true;
+  scene.add(road);
+
+  // Կենտրոնական գիծ
+  for (let i = -80; i < 80; i += 8) {
+    const dash = new THREE.Mesh(
+      new THREE.BoxGeometry(3, 0.06, 0.2),
+      new THREE.MeshStandardMaterial({ color: 0xffdd55, emissive: 0x443300 })
+    );
+    dash.position.set(i, 0.06, -5);
+    scene.add(dash);
+  }
+})();
+
+// Ուղղահայաց կենտրոնական (Մաշտոցի)
+(function addMashtotsAvenue() {
+  const road = new THREE.Mesh(
+    new THREE.BoxGeometry(14, 0.05, 200),
+    new THREE.MeshStandardMaterial({ color: 0x353535 })
+  );
+  road.position.set(0, 0.03, 20);
+  road.receiveShadow = true;
+  scene.add(road);
+
+  for (let i = -80; i < 80; i += 8) {
+    const dash = new THREE.Mesh(
+      new THREE.BoxGeometry(0.2, 0.06, 3),
+      new THREE.MeshStandardMaterial({ color: 0xffdd55, emissive: 0x443300 })
+    );
+    dash.position.set(0, 0.06, i + 20);
+    scene.add(dash);
+  }
+})();
+
+// ============================================================
+// ԾԱՌԵՐ ԱՄԵՆ ՈՒՐ (decorative)
+// ============================================================
+function addTree(x, z) {
+  const trunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.3, 0.4, 3, 8),
+    new THREE.MeshStandardMaterial({ color: 0x8b5a2b })
+  );
+  trunk.position.set(x, 1.5, z);
+  trunk.castShadow = true;
+  scene.add(trunk);
+
+  const leaves = new THREE.Mesh(
+    new THREE.SphereGeometry(1.8, 8, 8),
+    new THREE.MeshStandardMaterial({ color: 0x2a7a3a })
+  );
+  leaves.position.set(x, 4, z);
+  leaves.castShadow = true;
+  scene.add(leaves);
+}
+
+// Ծառեր հրապարակի շուրջ
+for (let i = 0; i < 12; i++) {
+  const angle = (i / 12) * Math.PI * 2;
+  const tx = Math.cos(angle) * 32;
+  const tz = Math.sin(angle) * 32;
+  addTree(tx, tz);
+}
+
+// Ծառեր ուղիների երկայնքով
+for (let i = -80; i < 80; i += 15) {
+  addTree(i, -15);
+  addTree(i, 5);
+  addTree(-15, i + 20);
+  addTree(15, i + 20);
+ }
 
 /* ============================================================
    ՄԱՍ 5 — SAMAKAT MODEL + INDIAN COURIER (ՎԵՐՋՆԱԿԱՆ)

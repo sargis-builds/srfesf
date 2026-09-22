@@ -338,201 +338,6 @@ body {
     "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
   }
 }
-
-/* ============================================================
-   MOBILE JOYSTICK + TOUCH CAMERA LOOK
-   ============================================================ */
-
-// ========== JOYSTICK ==========
-const joystickZone = document.getElementById('joystickZone');
-const joystickBase = document.getElementById('joystickBase');
-const joystickKnob = document.getElementById('joystickKnob');
-
-let joystickActive = false;
-let joystickTouchId = null;
-let joystickCenterX = 0;
-let joystickCenterY = 0;
-const JOYSTICK_RADIUS = 50;
-const DEAD_ZONE = 0.20;
-
-function getJoystickCenter() {
-  if (!joystickBase) return;
-  const rect = joystickBase.getBoundingClientRect();
-  joystickCenterX = rect.left + rect.width / 2;
-  joystickCenterY = rect.top + rect.height / 2;
-}
-
-function handleJoystickStart(e) {
-  if (joystickActive || !joystickBase) return;
-  const touch = e.changedTouches[0];
-  joystickTouchId = touch.identifier;
-  joystickActive = true;
-  getJoystickCenter();
-  handleJoystickMove(e);
-}
-
-function handleJoystickMove(e) {
-  if (!joystickActive) return;
-  let touch = null;
-  for (const t of e.changedTouches) {
-    if (t.identifier === joystickTouchId) {
-      touch = t;
-      break;
-    }
-  }
-  if (!touch) return;
-
-  let dx = touch.clientX - joystickCenterX;
-  let dy = touch.clientY - joystickCenterY;
-
-  const dist = Math.sqrt(dx * dx + dy * dy);
-  if (dist > JOYSTICK_RADIUS) {
-    dx = (dx / dist) * JOYSTICK_RADIUS;
-    dy = (dy / dist) * JOYSTICK_RADIUS;
-  }
-
-  if (joystickKnob) {
-    joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-  }
-
-  const nx = dx / JOYSTICK_RADIUS;
-  const ny = dy / JOYSTICK_RADIUS;
-
-  if (nx < -DEAD_ZONE) {
-    keys['KeyA'] = true; keys['KeyD'] = false;
-  } else if (nx > DEAD_ZONE) {
-    keys['KeyD'] = true; keys['KeyA'] = false;
-  } else {
-    keys['KeyA'] = false; keys['KeyD'] = false;
-  }
-
-  if (ny < -DEAD_ZONE) {
-    keys['KeyW'] = true; keys['KeyS'] = false;
-  } else if (ny > DEAD_ZONE) {
-    keys['KeyS'] = true; keys['KeyW'] = false;
-  } else {
-    keys['KeyW'] = false; keys['KeyS'] = false;
-  }
-}
-
-function handleJoystickEnd(e) {
-  if (!joystickActive) return;
-  let found = false;
-  for (const t of e.changedTouches) {
-    if (t.identifier === joystickTouchId) {
-      found = true; break;
-    }
-  }
-  if (!found) return;
-
-  joystickActive = false;
-  joystickTouchId = null;
-
-  if (joystickKnob) {
-    joystickKnob.style.transform = 'translate(0px, 0px)';
-  }
-
-  keys['KeyA'] = false;
-  keys['KeyD'] = false;
-  keys['KeyW'] = false;
-  keys['KeyS'] = false;
-}
-
-if (joystickZone) {
-  joystickZone.addEventListener('touchstart', handleJoystickStart, { passive: false });
-  joystickZone.addEventListener('touchmove', handleJoystickMove, { passive: false });
-  joystickZone.addEventListener('touchend', handleJoystickEnd, { passive: false });
-  joystickZone.addEventListener('touchcancel', handleJoystickEnd, { passive: false });
-}
-
-// ========== TOUCH CAMERA LOOK ==========
-const touchLookZone = document.getElementById('touchLookZone');
-
-let cameraYawOffset = 0;          // ⚠️ ՆՈՐ — camera-ի լրացուցիչ պտույտ
-let lookTouchId = null;
-let lookLastX = 0;
-let lookLastY = 0;
-const LOOK_SENSITIVITY = 0.005;   // ⚠️ Զգայունություն
-const LOOK_MIN = -Math.PI / 3;    // -60°
-const LOOK_MAX = Math.PI / 3;     // +60°
-
-function handleLookStart(e) {
-  if (!touchLookZone) return;
-  if (lookTouchId !== null) return;
-  const touch = e.changedTouches[0];
-  lookTouchId = touch.identifier;
-  lookLastX = touch.clientX;
-  lookLastY = touch.clientY;
-}
-
-function handleLookMove(e) {
-  if (lookTouchId === null) return;
-  let touch = null;
-  for (const t of e.changedTouches) {
-    if (t.identifier === lookTouchId) {
-      touch = t; break;
-    }
-  }
-  if (!touch) return;
-
-  const dx = touch.clientX - lookLastX;
-  const dy = touch.clientY - lookLastY;
-
-  lookLastX = touch.clientX;
-  lookLastY = touch.clientY;
-
-  // ⚠️ Փոխում ենք camera-ի yaw-ը
-  cameraYawOffset -= dx * LOOK_SENSITIVITY;
-  cameraYawOffset = Math.max(LOOK_MIN, Math.min(LOOK_MAX, cameraYawOffset));
-}
-
-function handleLookEnd(e) {
-  if (lookTouchId === null) return;
-  for (const t of e.changedTouches) {
-    if (t.identifier === lookTouchId) {
-      lookTouchId = null;
-      break;
-    }
-  }
-}
-
-if (touchLookZone) {
-  touchLookZone.addEventListener('touchstart', handleLookStart, { passive: false });
-  touchLookZone.addEventListener('touchmove', handleLookMove, { passive: false });
-  touchLookZone.addEventListener('touchend', handleLookEnd, { passive: false });
-  touchLookZone.addEventListener('touchcancel', handleLookEnd, { passive: false });
-}
-
-// ========== DESKTOP — MOUSE LOOK ==========
-// ⚠️ Եթե desktop-ում ուզում ես մկնիկի աջ կոճակով պտտել camera-ը
-let mouseLookActive = false;
-
-window.addEventListener('mousedown', (e) => {
-  if (e.button === 2) {  // աջ կոճակ
-    mouseLookActive = true;
-    lookLastX = e.clientX;
-    lookLastY = e.clientY;
-    e.preventDefault();
-  }
-});
-
-window.addEventListener('mousemove', (e) => {
-  if (!mouseLookActive) return;
-  const dx = e.clientX - lookLastX;
-  lookLastX = e.clientX;
-  cameraYawOffset -= dx * LOOK_SENSITIVITY;
-  cameraYawOffset = Math.max(LOOK_MIN, Math.min(LOOK_MAX, cameraYawOffset));
-});
-
-window.addEventListener('mouseup', (e) => {
-  if (e.button === 2) {
-    mouseLookActive = false;
-  }
-});
-
-window.addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-});
 </script>
 
 <script type="module">
@@ -541,6 +346,9 @@ import * as THREE from 'three';
 
 // ⚠️ DEBUG flag — FPS և console.log-երի համար
 const DEBUG = false;
+
+// ⚠️ Camera-ի լրացուցիչ պտույտ (touch look-ի համար)
+let cameraYawOffset = 0;
 
 // === ՄԱՍ 2-ը կցվում է այստեղից ===
 
@@ -1880,25 +1688,22 @@ const camDesiredLook = new THREE.Vector3();
 let camInitialized = false;
 
 function updateCamera(dt) {
-  const h = playerState.heading;
+  const h = playerState.heading + cameraYawOffset;  // ⚠️ Ավելացնում ենք offset-ը
   const forwardX = Math.sin(h);
   const forwardZ = Math.cos(h);
 
-  // Տեսախցիկը կանգնում է մեքենայի ՀԵՏԵՎՈՒՄ
   camDesiredPos.set(
     player.position.x - forwardX * CAM_DISTANCE,
     player.position.y + CAM_HEIGHT,
     player.position.z - forwardZ * CAM_DISTANCE
   );
 
-  // Նայում է մեքենայից ԱՌԱՋ
   camDesiredLook.set(
     player.position.x + forwardX * CAM_LOOK_AHEAD,
     player.position.y + 1.5,
     player.position.z + forwardZ * CAM_LOOK_AHEAD
   );
 
-  // Սահուն lerp
   const posLerp = 1 - Math.exp(-CAM_SMOOTH_POS * dt);
   const lookLerp = 1 - Math.exp(-CAM_SMOOTH_LOOK * dt);
 

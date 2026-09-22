@@ -2630,8 +2630,7 @@ let lookTouchId = null;
 let lookLastX = 0;
 let lookLastY = 0;
 const LOOK_SENSITIVITY = 0.005;
-const LOOK_MIN = -Math.PI / 3;
-const LOOK_MAX = Math.PI / 3;
+
 
 function handleLookStart(e) {
   if (!touchLookZone) return;
@@ -2667,7 +2666,7 @@ function handleLookMove(e) {
 
   // ⚠️ Pitch (վերև/ներքև, -60°-ից +60°)
   cameraPitchOffset += dy * LOOK_SENSITIVITY;
-  cameraPitchOffset = Math.max(Math.PI / 85, Math.min(Math.PI / 4, cameraPitchOffset));
+  cameraPitchOffset = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, cameraPitchOffset));
 }
 
 
@@ -2710,7 +2709,7 @@ window.addEventListener('mousemove', (e) => {
   cameraYawOffset -= dx * LOOK_SENSITIVITY;
 
   cameraPitchOffset += dy * LOOK_SENSITIVITY;
-  cameraPitchOffset = Math.max(Math.PI / 85, Math.min(Math.PI / 4, cameraPitchOffset));
+  cameraPitchOffset = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, cameraPitchOffset));
 });
 
 window.addEventListener('mouseup', (e) => {

@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Epica: Campaign Conquest</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600&display=swap');
+
+        html, body {
+            background: #020408;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .screen {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .active-screen {
+            display: flex;
+        }
+
+        .box-container {
+            background: rgba(8, 12, 20, 0.95);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(217, 119, 6, 0.5);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.95);
+        }
+
+        .box-container h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 32px;
+            margin-top: 0;
+            color: #fbbf24;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 15px rgba(245,158,11,0.4);
+        }
+
+        .rules-list {
+            text-align: left;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(217, 119, 6, 0.3);
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .rules-list li {
+            margin-bottom: 12px;
+        }
+
+        .highlight-danger {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .level-card {
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid rgba(217, 119, 6, 0.3);
+            border-radius: 14px;
+            padding: 20px 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .level-card:hover:not(.locked) {
+            border-color: #fbbf24;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+        }
+
+        .level-card.locked {
+            opacity: 0.4;
+            border-color: #334155;
+            cursor: not-allowed;
+        }
+
+        .level-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: #fbbf24;
+        }
+
+        .level-subtitle {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .battle-arena-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: #020408;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        button {
+            background: linear-gradient(180deg, #d97706, #b45309);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 10px;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 4px 0 #78350f, 0 8px 20px rgba(0,0,0,0.5);
+        }
+
+        button:disabled {
+            background: #1e293b;
+            border-color: rgba(255, 255, 255, 0.05);
+            color: #475569;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .shop-item-card {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(217, 119, 6, 0.3);
+            padding: 15px;
+            border-radius: 14px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        #hud-left-panel {
+            position: absolute;
+            bottom: 25px;
+            left: 30px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 10;
+        }
+
+        .ground-weapons-tray {
+            display: flex;
+            gap: 10px;
+            background: rgba(8, 12, 20, 0.88);
+            backdrop-filter: blur(15px);
+            padding: 14px;
+            border-radius: 16px;
+            border: 1px solid rgba(217, 119, 6, 0.4);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+
+        .ground-weapon-card {
+            background: linear-gradient(180deg, #1e293b, #0f172a);
+            border: 1px solid rgba(217, 119, 6, 0.4);
+            color: #fbbf24;
+            padding: 10px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            min-width: 90px;
+        }
+
+        .ground-weapon-card:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ⚡ Super Ability Button Styling */
+        #super-ability-btn {
+            background: linear-gradient(180deg, #2563eb, #1d4ed8);
+            border: 2px solid #60a5fa;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+            height: 100%;
+            padding: 15px 20px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        #turn-indicator {
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 14, 23, 0.9);
+            backdrop-filter: blur(15px);
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(217, 119, 6, 0.4);
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fbbf24;
+            z-index: 10;
+        }
+
+        #enemy-weapons-panel {
+            position: absolute;
+            top: 25px;
+            right: 30px;
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 10px 18px;
+            border-radius: 14px;
+            border: 1px solid rgba(220, 38, 38, 0.4);
+            color: #fca5a5;
+            font-size: 12px;
+            z-index: 10;
+        }
+
+        #game-over-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(3, 5, 8, 0.88);
+            backdrop-filter: blur(15px);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        #tutorial-overlay {
+    display: none; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh; 
+    background: rgba(0,0,0,0.85); 
+    backdrop-filter: blur(8px); 
+    z-index: 200; 
+    align-items: center; 
+    justify-content: center; 
+    flex-direction: column;
+}
+
+        .game-over-box {
+            background: rgba(10, 14, 23, 0.95);
+            border: 2px solid rgba(217, 119, 6, 0.6);
+            padding: 50px 70px;
+            border-radius: 24px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 0. ԽԱՂԻ ԿԱՆՈՆՆԵՐԻ ԷԿՐԱՆ -->
+    <div id="screen-rules" class="screen active-screen">
+        <div class="box-container">
+            <h2>📜 ԽԱՂԻ ԿԱՆՈՆՆԵՐԸ</h2>
+            <div class="rules-list">
+                <ul>
+                    <li>⚔️ <b>Հերթափոխով Մարտ:</b> Ընտրեք զենքը ձեր արսենալից՝ հակառակորդին հարվածելու համար:</li>
+                    <li>💰 <b>Արսենալ և Ոսկի:</b> Ամեն մակարդակ մտնելիս ստանում եք ոսկի: Խանութում կարող եք գնել ավելի հզոր զենքեր:</li>
+                    <li>⚠️ <span class="highlight-danger">ՀԱԿԱԴԱՐՁ ՎՆԱՍ (OVERKILL):</span> Եթե ձեր հասցրած վնասը գերազանցում է հակառակորդի մնացած HP-ն, <b>արտահոսած վնասը հետ է հարվածում ՁԵԶ</b>:</li>
+                    <li>⚡ <b>ԳԵՐՀԱՐՎԱԾ (3-րդ մակարդակից):</b> 3-րդ մակարդակից սկսած բացվում է Էներգետիկ Կայծակ կոճակը, որը լիցքավորվում է քայլերի ընթացքում և հասցնում հզոր վնաս:</li>
+                </ul>
+            </div>
+            <button onclick="showScreen('screen-levels')" style="font-size: 17px; padding: 12px 40px;">Հասկացա ➔</button>
+        </div>
+    </div>
+
+    <!-- 1. ՄԱԿԱՐԴԱԿՆԵՐԻ ԸՆՏՐՈՒԹՅԱՆ ԷԿՐԱՆ -->
+    <div id="screen-levels" class="screen">
+        <div class="box-container">
+            <h2>ԸՆՏՐԵՔ ՄԱԿԱՐԴԱԿԸ</h2>
+            <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Հաղթեք յուրաքանչյուր մարտում՝ հաջորդ փուլը բացելու համար</p>
+            <div class="levels-grid" id="levels-container"></div>
+            <button onclick="showScreen('screen-rules')" style="background: #334155; font-size: 13px;">📖 Կանոններ</button>
+        </div>
+    </div>
+
+    <!-- 2. ԽԱՆՈՒԹԻ ԷԿՐԱՆ -->
+    <div id="screen-shop" class="screen">
+        <div class="box-container">
+            <h2 id="shop-level-title">ՄԱԿԱՐԴԱԿ 1: ԱՐՍԵՆԱԼ</h2>
+            <p style="color: #fbbf24; font-size: 18px; font-weight: 600;">Հասանելի Ոսկի: <span id="player-gold">50</span> 🪙</p>
+            <div class="shop-grid" id="shop-items-container"></div>
+            <div style="display:flex; gap:15px; justify-content:center;">
+                <button onclick="showScreen('screen-levels')" style="background: #475569;">⬅️ Մակարդակներ</button>
+                <button onclick="startBattle()" style="font-size: 17px; padding: 12px 40px;">⚔️ Մարտի</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. ՄԱՐՏԻ ԷԿՐԱՆ -->
+    <div id="screen-battle" class="screen">
+        <div class="battle-arena-container">
+            <div id="turn-indicator">✨ Ձեր հերթն է</div>
+
+            <div id="enemy-weapons-panel">
+                <div style="font-weight: 700; margin-bottom: 4px; color: #ef4444;">🎯 Հակառակորդի Արսենալը:</div>
+                <div id="enemy-weapons-list"></div>
+            </div>
+
+            <div id="game-over-overlay">
+                <div class="game-over-box">
+                    <h2 id="overlay-title" style="color: #fbbf24; font-size: 32px; margin-bottom: 20px; font-family: 'Cinzel', serif;"></h2>
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button onclick="showScreen('screen-levels')">📜 Մակարդակներ</button>
+                        <button id="retry-level-btn" onclick="retryLevel()" style="background: linear-gradient(180deg, #d97706, #b45309); display: none;">🔄 Կրկին Փորձել</button>
+                        <button id="next-level-btn" onclick="nextLevel()" style="background: linear-gradient(180deg, #16a34a, #15803d); display: none;">⏩ Հաջորդ Մակարդակը</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="tutorial-overlay" style="display: flex; position: absolute; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; flex-direction: column;">
+                <div style="background: rgba(15, 23, 42, 0.95); border: 2px solid #60a5fa; padding: 30px 40px; border-radius: 20px; text-align: center; max-width: 450px; box-shadow: 0 0 30px rgba(37,99,235,0.5);">
+                    <h3 style="color: #60a5fa; font-family: 'Cinzel', serif; font-size: 24px; margin-top: 0;">⚡ ԳԵՐՀԱՐՎԱԾԻ ԱԿՏԻՎԱՑՈՒՄ</h3>
+                    <p style="color: #e2e8f0; font-size: 15px; line-height: 1.6; margin: 15px 0;">
+                        Օգտագործիր այս սուպեր էֆեկտը, եթե կարծում ես, որ թշնամին անհաղթելի է։
+                    </p>
+                    <div style="font-size: 35px; margin: 10px 0;">⬇️</div>
+                    <button onclick="closeTutorial()" style="background: linear-gradient(180deg, #2563eb, #1d4ed8); border: 1px solid #60a5fa; padding: 10px 30px; font-size: 15px;">Հասկացա ➔</button>
+                </div>
+            </div>
+
+            <canvas id="battleCanvas" width="1920" height="700"></canvas>
+
+            <div id="hud-left-panel">
+                <div class="ground-weapons-tray" id="ground-weapons-tray"></div>
+                <!-- ⚡ SUPER ABILITY BUTTON -->
+                <button id="super-ability-btn" onclick="useSuperAbility()" style="display:none;">
+                    ⚡ ԷՆԵՐԳԵՏԻԿ ԿԱՅԾԱԿ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const levelConfigs = [
+            {
+                level: 1, name: "Սկսնակ Դաշտ", unlocked: true,
+                startGold: 60,
+                enemyHp: 35, enemyWeapons: [{ id: "fist", name: "Բռունցք", damage: 5, infinite: true }, { id: "rock", name: "Քար", damage: 8 }],
+                aiType: "random", bgColors: ["#020408", "#1e1b4b", "#065f46", "#022c22"]
+            },
+            {
+                level: 2, name: "Մայրամուտի Ամրոց", unlocked: true,
+                startGold: 90,
+                enemyHp: 55, enemyWeapons: [{ id: "fist", name: "Բռունցք", damage: 6, infinite: true }, { id: "rock", name: "Քար", damage: 10 }, { id: "sword", name: "Սուր", damage: 15 }],
+                aiType: "random", bgColors: ["#2e1065", "#7c2d12", "#78350f", "#451a03"]
+            },
+            {
+                level: 3, name: "Լուսնյակ Գիշեր", unlocked: true,
+                startGold: 130,
+                enemyHp: 80, enemyWeapons: [{ id: "fist", name: "Բռունցք", damage: 8, infinite: true }, { id: "sword", name: "Սուր", damage: 16 }, { id: "axe", name: "Կացին", damage: 22 }],
+                aiType: "smart", bgColors: ["#090d16", "#0f172a", "#1e293b", "#0f172a"]
+            },
+            {
+                level: 4, name: "Անեծքի Գոտի", unlocked: true,
+                startGold: 170,
+                enemyHp: 110, enemyWeapons: [{ id: "fist", name: "Բռունցք", damage: 10, infinite: true }, { id: "sword", name: "Սուր", damage: 20 }, { id: "axe", name: "Կացին", damage: 28 }],
+                aiType: "smart", bgColors: ["#450a0a", "#78350f", "#365314", "#1a2e05"]
+            },
+            {
+                level: 5, name: "Dark Lord-ի Գահը", unlocked: true,
+                startGold: 220,
+                enemyHp: 150, enemyWeapons: [{ id: "fist", name: "Բռունցք", damage: 12, infinite: true }, { id: "sword", name: "Էլիտար Սուր", damage: 25 }, { id: "axe", name: "Տիտան Կացին", damage: 35 }],
+                aiType: "smart", bgColors: ["#000000", "#581c87", "#312e81", "#1e1b4b"]
+            }
+        ];
+
+        let currentLevelIdx = 0;
+        let currentTurn = 0;
+        let gameOver = false;
+
+        // ⚡ SUPER ABILITY VARIABLES
+        let superCooldownMax = 3; 
+        let superCooldownCurrent = 3; 
+        let flashEffectTimer = 0;
+
+        let tutorialShownLevel3 = false;
+
+function closeTutorial() {
+    tutorialShowLevel3 = true
+    document.getElementById("tutorial-overlay").style.display = "none";
+}
+
+        let players = [
+            { id: 0, name: "Էպիկական Հերոս", hp: 100, maxHp: 100, gold: 50, weapons: [], castleX: 250, squashX: 1, squashY: 1, hitPopups: [] },
+            { id: 1, name: "Թշնամի", hp: 100, maxHp: 100, weapons: [], castleX: 1670, squashX: 1, squashY: 1, hitPopups: [] }
+        ];
+
+        let shopWeapons = [
+            { id: "fist", name: "Բռունցք", price: 0, damage: 5, infinite: true },
+            { id: "rock", name: "Էպիկական Քար", price: 15, damage: 9 },
+            { id: "sword", name: "Ասպետական Սուր", price: 30, damage: 15 },
+            { id: "axe", name: "Մարտական Կացին", price: 50, damage: 24 }
+        ];
+
+        let loadedWeapon = null;
+        let catapultAnim = { pulling: 0, releaseKick: 0 };
+        let flyingProjectile = null;
+        let particles = [];
+
+        const canvas = document.getElementById("battleCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            document.getElementById(screenId).classList.add('active-screen');
+            if(screenId === 'screen-levels') renderLevelsUI();
+            if(screenId === 'screen-shop') updateShopUI();
+            if(screenId === 'screen-battle') requestAnimationFrame(gameLoop);
+        }
+
+        function renderLevelsUI() {
+            let container = document.getElementById("levels-container");
+            container.innerHTML = "";
+            levelConfigs.forEach((lvl, idx) => {
+                let card = document.createElement("div");
+                card.className = `level-card ${lvl.unlocked ? '' : 'locked'}`;
+                card.innerHTML = `
+                    <div class="level-title">${lvl.level}</div>
+                    <div style="font-weight:600; font-size:13px; color:#e2e8f0; margin-top:4px;">${lvl.name}</div>
+                    <div class="level-subtitle">${lvl.unlocked ? '🔓 Բացված' : '🔒 Փակ է'}</div>
+                `;
+                if(lvl.unlocked) {
+                    card.onclick = () => selectLevel(idx);
+                }
+                container.appendChild(card);
+            });
+        }
+
+        function selectLevel(idx) {
+            currentLevelIdx = idx;
+            let config = levelConfigs[idx];
+
+            players[0].hp = 100;
+            players[0].maxHp = 100;
+            players[0].gold = config.startGold;
+            players[0].weapons = [{ ...shopWeapons[0] }];
+
+            players[1].name = `Թշնամի (Lvl ${config.level})`;
+            players[1].hp = config.enemyHp;
+            players[1].maxHp = config.enemyHp;
+            players[1].weapons = JSON.parse(JSON.stringify(config.enemyWeapons));
+
+            // Super Ability-ն մշտապես լիցքավորված է սկզբում
+            superCooldownCurrent = superCooldownMax;
+
+            document.getElementById("shop-level-title").innerText = `ՄԱԿԱՐԴԱԿ ${config.level}: ${config.name}`;
+            showScreen('screen-shop');
+        }
+
+        function updateShopUI() {
+            document.getElementById("player-gold").innerText = players[0].gold;
+            let container = document.getElementById("shop-items-container");
+            container.innerHTML = "";
+
+            shopWeapons.forEach(w => {
+                let card = document.createElement("div");
+                card.className = "shop-item-card";
+                let isOwned = w.infinite ? "Անսահման" : `${w.price} 🪙`;
+                card.innerHTML = `
+                    <div>
+                        <div style="font-family:'Cinzel',serif; font-weight:700; color:#fbbf24; font-size:15px; margin-bottom:6px;">${w.name}</div>
+                        <div style="color:#94a3b8; font-size:12px; margin-bottom:10px;">⚔️ Վնաս: ${w.damage}</div>
+                    </div>
+                    <div>
+                        <div style="color:#f59e0b; font-weight:600; font-size:13px; margin-bottom:8px;">${isOwned}</div>
+                        <button onclick="buyWeapon('${w.id}')" style="width:100%; padding:6px; font-size:12px;" ${w.price > players[0].gold || w.infinite ? 'disabled' : ''}>Գնել</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function buyWeapon(wId) {
+            let item = shopWeapons.find(x => x.id === wId);
+            if (item.infinite) return;
+            if (players[0].gold >= item.price) {
+                players[0].gold -= item.price;
+                players[0].weapons.push({ ...item });
+                updateShopUI();
+            }
+        }
+
+        function startBattle() {
+            gameOver = false;
+            currentTurn = 0;
+            showScreen('screen-battle');
+            updateHUD();
+        }
+
+        function selectWeaponFromGround(index) {
+            if (currentTurn !== 0 || flyingProjectile || gameOver) return;
+            let p = players[0];
+            if (p.weapons[index]) {
+                if (loadedWeapon && !loadedWeapon.infinite) p.weapons.push(loadedWeapon);
+                
+                let selected = p.weapons[index];
+                if (selected.infinite) {
+                    loadedWeapon = { ...selected };
+                } else {
+                    loadedWeapon = p.weapons.splice(index, 1)[0];
+                }
+                
+                catapultAnim.pulling = 1;
+                setTimeout(() => {
+                    fireCatapultAnimation();
+                }, 250);
+                updateHUD();
+            }
+        }
+
+        function fireCatapultAnimation() {
+            if (!loadedWeapon || flyingProjectile) return;
+            catapultAnim.pulling = 0;
+            catapultAnim.releaseKick = 1;
+
+            let weapon = loadedWeapon;
+            loadedWeapon = null;
+            launchProjectile(players[0], players[1], weapon);
+            updateHUD();
+        }
+
+        function launchProjectile(shooter, target, weapon) {
+    flyingProjectile = {
+        startX: shooter.castleX + (shooter.id === 0 ? 110 : -110), 
+        startY: 440,
+        targetX: target.castleX + (shooter.id === 0 ? -50 : 50), 
+        targetY: 450,
+        type: weapon.id,
+        damage: weapon.damage,
+        shooter: shooter,
+        target: target,
+        progress: 0,
+        speed: 0.04 // 👈 Սովորական զենքերի արագ կրակոց
+    };
+}
+
+        function useSuperAbility() {
+    if (currentLevelIdx < 2) return;
+    if (superCooldownCurrent < superCooldownMax) return;
+    if (currentTurn !== 0 || flyingProjectile || gameOver) return;
+
+    superCooldownCurrent = 0;
+
+    // ⚡ ԷՖԵԿՏԻ ՏԵՎՈՂՈՒԹՅՈՒՆԸ ԱՌԱՆՁԻՆ Է (Կապ չունի launchProjectile-ի հետ)
+    // 14 = կարճ/արագ կայծակ, 60 = 1 վայրկյան տևողությամբ դանդաղ էֆեկտ
+    flashEffectTimer = 14; 
+
+    let superDamage = 35;
+    let enemy = players[1];
+
+    if (superDamage > enemy.hp) {
+        let excess = superDamage - enemy.hp;
+        enemy.hp = 0;
+        players[0].hp = Math.max(0, players[0].hp - excess);
+    } else {
+        enemy.hp -= superDamage;
+    }
+
+    enemy.squashX = 1.4;
+    enemy.squashY = 0.6;
+    enemy.hitPopups.push({ text: `⚡ -${superDamage} SUPER!`, alpha: 1, yOffset: 0 });
+
+    checkGameOver();
+    if (!gameOver) switchTurn();
+    updateHUD();
+}
+
+
+        function handleHit(projectile) {
+            let target = projectile.target;
+            let shooter = projectile.shooter;
+            let dmg = projectile.damage;
+
+            let excessDamage = 0;
+            if (dmg > target.hp) {
+                excessDamage = dmg - target.hp;
+                target.hp = 0;
+            } else {
+                target.hp -= dmg;
+            }
+
+            target.squashX = 1.25;
+            target.squashY = 0.75;
+            target.hitPopups.push({ text: `-${dmg - excessDamage}`, alpha: 1, yOffset: 0 });
+
+            if (excessDamage > 0) {
+                shooter.hp -= excessDamage;
+                if (shooter.hp < 0) shooter.hp = 0;
+                shooter.squashX = 1.2;
+                shooter.squashY = 0.8;
+                shooter.hitPopups.push({ text: `⚠️ Հետհարված: -${excessDamage}`, alpha: 1, yOffset: -25 });
+            }
+
+            for (let i = 0; i < 25; i++) {
+                particles.push({
+                    x: target.castleX, y: 480,
+                    vx: (Math.random() - 0.5) * 14, vy: (Math.random() - 0.7) * 10,
+                    radius: Math.random() * 6 + 2, color: "#f59e0b", alpha: 1, decay: 0.02
+                });
+            }
+
+            checkGameOver();
+            if (!gameOver) switchTurn();
+            updateHUD();
+        }
+
+        // ⚡ SUPER ABILITY USE FUNCTION
+        function useSuperAbility() {
+            if (currentLevelIdx < 2) return; // Միայն 3-րդ մակարդակից սկսած (Level 3-ը ունի index 2)
+            if (superCooldownCurrent < superCooldownMax) return;
+            if (currentTurn !== 0 || flyingProjectile || gameOver) return;
+
+            superCooldownCurrent = 0;
+            flashEffectTimer = 14; // Կայծակի էֆեկտի տևողությունը
+
+            let superDamage = 35;
+            let enemy = players[1];
+
+            if (superDamage > enemy.hp) {
+                let excess = superDamage - enemy.hp;
+                enemy.hp = 0;
+                players[0].hp = Math.max(0, players[0].hp - excess);
+            } else {
+                enemy.hp -= superDamage;
+            }
+
+            enemy.squashX = 1.4;
+            enemy.squashY = 0.6;
+            enemy.hitPopups.push({ text: `⚡ -${superDamage} SUPER!`, alpha: 1, yOffset: 0 });
+
+            checkGameOver();
+            if (!gameOver) switchTurn();
+            updateHUD();
+        }
+
+        function switchTurn() {
+            currentTurn = 1 - currentTurn;
+            
+            // ⚡ Ամեն անգամ երբ հերթը վերադառնում է խաղացողին, լիցքավորում ենք Super-ը
+            if (currentTurn === 0 && superCooldownCurrent < superCooldownMax) {
+                superCooldownCurrent++;
+            }
+
+            if (currentTurn === 1 && !gameOver) {
+                setTimeout(botTurn, 800);
+            }
+            updateHUD();
+        }
+
+        function botTurn() {
+            if (gameOver) return;
+            let bot = players[1];
+            let config = levelConfigs[currentLevelIdx];
+            let chosenWeapon = null;
+
+            if (bot.weapons.length > 0) {
+                if (config.aiType === 'smart') {
+                    bot.weapons.sort((a, b) => b.damage - a.damage);
+                    chosenWeapon = bot.weapons[0];
+                } else {
+                    chosenWeapon = bot.weapons[Math.floor(Math.random() * bot.weapons.length)];
+                }
+                
+                let wIndex = bot.weapons.indexOf(chosenWeapon);
+                if (!chosenWeapon.infinite) {
+                    bot.weapons.splice(wIndex, 1);
+                }
+                launchProjectile(bot, players[0], chosenWeapon);
+            }
+            updateHUD();
+        }
+
+        function checkGameOver() {
+            let nextBtn = document.getElementById("next-level-btn");
+            let retryBtn = document.getElementById("retry-level-btn");
+
+            if (players[0].hp <= 0 && players[1].hp <= 0) {
+                gameOver = true;
+                nextBtn.style.display = "none";
+                retryBtn.style.display = "inline-block";
+                document.getElementById("overlay-title").innerText = "💀 ԵՐԿՈՒՍԴ ԷԼ ՊԱՐՏՎԵՑԻՔ (OVERKILL)!";
+                setTimeout(() => { document.getElementById("game-over-overlay").style.display = "flex"; }, 600);
+            } else if (players[1].hp <= 0) {
+                gameOver = true;
+                if (currentLevelIdx + 1 < levelConfigs.length) {
+                    levelConfigs[currentLevelIdx + 1].unlocked = true;
+                    nextBtn.style.display = "inline-block";
+                } else {
+                    nextBtn.style.display = "none";
+                }
+                retryBtn.style.display = "none";
+                document.getElementById("overlay-title").innerText = "🏆 ՄԱԿԱՐԴԱԿՆ ԱՆՑՎԱԾ Է!";
+                setTimeout(() => { document.getElementById("game-over-overlay").style.display = "flex"; }, 600);
+            } else if (players[0].hp <= 0) {
+                gameOver = true;
+                nextBtn.style.display = "none";
+                retryBtn.style.display = "inline-block";
+                document.getElementById("overlay-title").innerText = "💀 ՊԱՐՏՈՒԹՅՈՒՆ";
+                setTimeout(() => { document.getElementById("game-over-overlay").style.display = "flex"; }, 600);
+            }
+        }
+
+        function retryLevel() {
+            document.getElementById("game-over-overlay").style.display = "none";
+            selectLevel(currentLevelIdx);
+        }
+
+        function nextLevel() {
+            document.getElementById("game-over-overlay").style.display = "none";
+            if (currentLevelIdx + 1 < levelConfigs.length) {
+                selectLevel(currentLevelIdx + 1);
+            }
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            let config = levelConfigs[currentLevelIdx];
+            let colors = config.bgColors;
+
+            let skyGrad = ctx.createLinearGradient(0, 0, 0, 540);
+            skyGrad.addColorStop(0, colors[0]);
+            skyGrad.addColorStop(1, colors[1]);
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, canvas.width, 540);
+
+            let groundGrad = ctx.createLinearGradient(0, 540, 0, 700);
+            groundGrad.addColorStop(0, colors[2]);
+            groundGrad.addColorStop(1, colors[3]);
+            ctx.fillStyle = groundGrad;
+            ctx.fillRect(0, 540, canvas.width, 160);
+
+            catapultAnim.releaseKick *= 0.85;
+
+            players.forEach(p => {
+                p.squashX += (1 - p.squashX) * 0.1;
+                p.squashY += (1 - p.squashY) * 0.1;
+            });
+
+            drawDetailedBattlefield(players[0], true);
+            drawDetailedBattlefield(players[1], false);
+
+            drawHpBar(players[0]);
+            drawHpBar(players[1]);
+
+            if (flyingProjectile) {
+                flyingProjectile.progress += flyingProjectile.speed;
+                if (flyingProjectile.progress >= 1) {
+                    let proj = flyingProjectile;
+                    flyingProjectile = null;
+                    handleHit(proj);
+                } else {
+                    let currentX = flyingProjectile.startX + (flyingProjectile.targetX - flyingProjectile.startX) * flyingProjectile.progress;
+                    let heightCurve = Math.sin(flyingProjectile.progress * Math.PI) * 260;
+                    let currentY = flyingProjectile.startY - heightCurve;
+                    drawTexturedWeapon(ctx, flyingProjectile.type, currentX, currentY, 45, flyingProjectile.progress * Math.PI * 6);
+                }
+            }
+
+            players.forEach(p => {
+                for (let i = p.hitPopups.length - 1; i >= 0; i--) {
+                    let pop = p.hitPopups[i];
+                    pop.yOffset -= 1.5; pop.alpha -= 0.02;
+                    ctx.save();
+                    ctx.font = "bold 22px 'Cinzel', serif";
+                    ctx.fillStyle = `rgba(239, 68, 68, ${pop.alpha})`;
+                    ctx.textAlign = "center";
+                    ctx.fillText(pop.text, p.castleX, 320 + pop.yOffset);
+                    ctx.restore();
+                    if (pop.alpha <= 0) p.hitPopups.splice(i, 1);
+                }
+            });
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let pt = particles[i];
+                pt.x += pt.vx; pt.y += pt.vy; pt.alpha -= pt.decay;
+                if (pt.alpha <= 0) particles.splice(i, 1);
+                else {
+                    ctx.fillStyle = pt.color; ctx.globalAlpha = pt.alpha;
+                    ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2); ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                }
+            }
+
+            // ⚡ FLASH LIGHTNING EFFECT (Invert colors quickly)
+            if (flashEffectTimer > 0) {
+                flashEffectTimer--;
+                ctx.save();
+                if (flashEffectTimer > 7) {
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.globalCompositeOperation = "difference";
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                } else {
+                    ctx.fillStyle = "rgba(0, 0, 0, 0.95)";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.globalCompositeOperation = "exclusion";
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+                ctx.restore();
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function drawDetailedBattlefield(player, isHuman) {
+            let x = player.castleX;
+            ctx.save();
+            ctx.translate(x, 540);
+            ctx.scale(player.squashX * (isHuman ? 1 : -1), player.squashY);
+
+            ctx.fillStyle = "#334155"; ctx.fillRect(-100, -220, 140, 220);
+            ctx.fillStyle = "#1e293b"; ctx.fillRect(-80, -200, 100, 200);
+            ctx.fillStyle = "#475569";
+            for(let i = -100; i < 40; i += 35) ctx.fillRect(i, -240, 22, 20);
+
+            ctx.save();
+            ctx.translate(-20, -220);
+            ctx.fillStyle = isHuman ? "#3b82f6" : "#dc2626"; ctx.fillRect(-12, -35, 24, 35);
+            ctx.fillStyle = "#94a3b8"; ctx.beginPath(); ctx.arc(0, -45, 12, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+
+            ctx.save();
+            let kickOffset = Math.sin(Date.now() * 0.02) * catapultAnim.releaseKick * 15;
+            ctx.translate(70 + kickOffset, 0);
+            ctx.strokeStyle = "#78350f"; ctx.lineWidth = 7;
+            ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(20, -60); ctx.lineTo(40, 0); ctx.stroke();
+
+            if (isHuman && loadedWeapon) {
+                drawTexturedWeapon(ctx, loadedWeapon.id, -10, -85, 35, 0);
+            }
+            ctx.restore();
+
+            ctx.restore();
+        }
+
+        function drawTexturedWeapon(ctx, type, x, y, size, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            if (type === "fist") {
+                ctx.fillStyle = "#fca5a5"; ctx.beginPath(); ctx.arc(0, 0, size * 0.35, 0, Math.PI * 2); ctx.fill();
+            } else if (type === "rock") {
+                ctx.fillStyle = "#64748b"; ctx.beginPath(); ctx.roundRect(-size*0.4, -size*0.4, size*0.8, size*0.8, 6); ctx.fill();
+            } else if (type === "sword") {
+                ctx.fillStyle = "#cbd5e1"; ctx.fillRect(-size*0.1, -size*0.5, size*0.2, size);
+            } else if (type === "axe") {
+                ctx.fillStyle = "#78350f"; ctx.fillRect(-size*0.1, -size*0.4, size*0.2, size);
+                ctx.fillStyle = "#dc2626"; ctx.beginPath(); ctx.arc(0, -size*0.2, size*0.4, 0, Math.PI); ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawHpBar(player) {
+            let x = player.castleX;
+            ctx.save();
+            ctx.translate(x, 160);
+            ctx.fillStyle = "rgba(3, 5, 8, 0.85)";
+            ctx.beginPath(); ctx.roundRect(-70, 0, 140, 16, 8); ctx.fill();
+            let fillW = (player.hp / player.maxHp) * 136;
+            ctx.fillStyle = player.hp > 40 ? "#16a34a" : "#dc2626";
+            ctx.beginPath(); ctx.roundRect(-68, 2, Math.max(0, fillW), 12, 6); ctx.fill();
+            ctx.fillStyle = "#ffffff"; ctx.font = "bold 13px 'Cinzel', serif"; ctx.textAlign = "center";
+            ctx.fillText(`${player.name} (${player.hp} HP)`, 0, -8);
+            ctx.restore();
+        }
+
+        function updateHUD() {
+            let tray = document.getElementById("ground-weapons-tray");
+            tray.innerHTML = "";
+            players[0].weapons.forEach((w, index) => {
+                let btn = document.createElement("button");
+                btn.className = "ground-weapon-card";
+                btn.innerHTML = `<div style="font-weight:700; font-size:12px;">${w.name}</div><div style="font-size:11px; color:#94a3b8;">⚔️ ${w.damage}</div>`;
+                btn.onclick = () => selectWeaponFromGround(index);
+                if (currentTurn !== 0 || flyingProjectile || gameOver) btn.disabled = true;
+                tray.appendChild(btn);
+            });
+
+            let enemyList = document.getElementById("enemy-weapons-list");
+            enemyList.innerHTML = players[1].weapons.map(w => `• ${w.name} (${w.damage} Dmg)`).join("<br>");
+
+            let indicator = document.getElementById("turn-indicator");
+            if (!gameOver) {
+                indicator.innerText = currentTurn === 0 ? "✨ Ձեր հերթն է" : "⚔️ Հակառակորդի հերթն է...";
+            }
+
+            // ⚡ SUPER ABILITY HUD UPDATE
+            let superBtn = document.getElementById("super-ability-btn");
+            if (superBtn) {
+                if (currentLevelIdx >= 2) { // Level 3-ից սկսած (index 2)
+                    superBtn.style.display = "inline-block";
+                    if (superCooldownCurrent >= superCooldownMax) {
+                        superBtn.disabled = (currentTurn !== 0 || flyingProjectile || gameOver);
+                        superBtn.innerText = "⚡ ԷՆԵՐԳԵՏԻԿ ԿԱՅԾԱԿ (100%)";
+                        superBtn.style.background = "linear-gradient(180deg, #2563eb, #1d4ed8)";
+                    } else {
+                        superBtn.disabled = true;
+                        let percent = Math.floor((superCooldownCurrent / superCooldownMax) * 100);
+                        superBtn.innerText = `⏳ Լիցքավորում... (${percent}%)`;
+                        superBtn.style.background = "#334155";
+                    }
+                } else {
+                    superBtn.style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

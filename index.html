@@ -3508,7 +3508,7 @@ function drawFullscreenMap() {
   ctx.arc(centerX, centerY, radiusPixels, 0, Math.PI * 2);
   ctx.clip();
 
-  // Փողոցներ
+    // Փողոցներ (անուններով)
   if (typeof STREETS !== 'undefined') {
     STREETS.forEach(street => {
       if (street.points.length < 2) return;
@@ -3530,6 +3530,22 @@ function drawFullscreenMap() {
         ctx.lineTo(p.x, p.y);
       }
       ctx.stroke();
+
+      // ⚠️ ԱՆՈՒՆԸ
+      const midIndex = Math.floor(street.points.length / 2);
+      const midPoint = street.points[midIndex];
+      const mp = worldToMap(midPoint.x, midPoint.z);
+
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const textWidth = ctx.measureText(street.name).width;
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillRect(mp.x - textWidth / 2 - 4, mp.y - 8, textWidth + 8, 16);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.fillText(street.name, mp.x, mp.y);
     });
   }
 

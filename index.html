@@ -290,6 +290,278 @@ body {
     font-size: 36px;
   }
 }
+
+/* ============================================================
+   FULLSCREEN MAP
+   ============================================================ */
+
+#fullscreenMap {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 50vw;
+  height: 100vh;
+  background: rgba(15, 15, 30, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 200;
+  display: none;
+  overflow: hidden;
+  cursor: grab;
+  border-left: 2px solid rgba(255, 209, 102, 0.6);
+}
+
+#fullscreenMap.open {
+  display: block;
+}
+
+#fullscreenMap.dragging {
+  cursor: grabbing;
+}
+
+#fullscreenMap.open {
+  display: block;
+}
+
+#fullscreenMap.open {
+  display: block;
+}
+
+#fullscreenMap.dragging {
+  cursor: grabbing;
+}
+
+#fullscreenMapCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#closeMapBtn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 60, 60, 0.9);
+  color: #fff;
+  border: 3px solid #fff;
+  font-size: 24px;
+  font-weight: 900;
+  cursor: pointer;
+  z-index: 201;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, background 0.15s;
+}
+
+#closeMapBtn:hover {
+  background: rgba(255, 30, 30, 1);
+  transform: scale(1.1);
+}
+
+#closeMapBtn:active {
+  transform: scale(0.95);
+}
+
+/* Minimap-ը դառնում է clickable */
+#minimap {
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+#minimap:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 40px rgba(255, 209, 102, 0.5);
+}
+
+/* ============================================================
+   FULLSCREEN MAP + STREETS LEGEND
+   ============================================================ */
+
+
+
+#fullscreenMap.open {
+  display: block;
+}
+
+#fullscreenMap.dragging {
+  cursor: grabbing;
+}
+
+#fullscreenMap.open {
+  display: block;
+}
+
+#fullscreenMap.dragging {
+  cursor: grabbing;
+}
+
+#fullscreenMapCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#closeMapBtn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 60, 60, 0.9);
+  color: #fff;
+  border: 3px solid #fff;
+  font-size: 24px;
+  font-weight: 900;
+  cursor: pointer;
+  z-index: 201;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#closeMapBtn:hover {
+  background: rgba(255, 30, 30, 1);
+  transform: scale(1.1);
+}
+
+/* ⚠️ ՓՈՂՈՑՆԵՐԻ ՑԱՆԿ */
+#streetsLegend {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 280px;
+  max-height: 70vh;
+  background: rgba(20, 20, 30, 0.95);
+  border: 2px solid rgba(255, 209, 102, 0.5);
+  border-radius: 12px;
+  padding: 15px;
+  z-index: 201;
+  overflow-y: auto;
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 13px;
+}
+
+#streetsLegend h3 {
+  font-size: 16px;
+  color: #ffd166;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 209, 102, 0.3);
+}
+
+#streetsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.streetItem {
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid #ffd166;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.streetItem:hover {
+  background: rgba(255, 209, 102, 0.15);
+}
+
+.streetItem.selected {
+  background: rgba(255, 209, 102, 0.3);
+  border-left-color: #4facfe;
+}
+
+.streetItem .streetName {
+  font-weight: 600;
+}
+
+.streetItem .streetType {
+  font-size: 10px;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.streetItem.type-avenue {
+  border-left-color: #4facfe;
+}
+
+.streetItem.type-main {
+  border-left-color: #ffd166;
+}
+
+.streetItem.type-small {
+  border-left-color: #888;
+}
+
+/* ⚠️ ԸՆՏՐՎԱԾ ՓՈՂՈՑԻ ԻՆՖՈՐՄԱՑԻԱ */
+#streetInfo {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 280px;
+  max-height: 40vh;
+  background: rgba(20, 20, 30, 0.95);
+  border: 2px solid rgba(79, 172, 254, 0.5);
+  border-radius: 12px;
+  padding: 15px;
+  z-index: 201;
+  overflow-y: auto;
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 12px;
+}
+
+#streetInfo h3 {
+  font-size: 15px;
+  color: #4facfe;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(79, 172, 254, 0.3);
+}
+
+#streetInfoPoints {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pointItem {
+  padding: 4px 8px;
+  background: rgba(79, 172, 254, 0.1);
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.pointItem .pointIndex {
+  color: #ffd166;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+/* Minimap-ը clickable */
+#minimap {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 </style>
 </head>
 <body>
@@ -338,6 +610,26 @@ body {
 
 <div id="touchLookZone"></div>
 <div id="fpsCounter">FPS: 0</div>
+<!-- ⬇️ FULLSCREEN MAP ⬇️ -->
+<div id="fullscreenMap">
+  <canvas id="fullscreenMapCanvas"></canvas>
+  <button id="closeMapBtn">✕</button>
+</div><div id="fullscreenMap">
+  <canvas id="fullscreenMapCanvas"></canvas>
+  <button id="closeMapBtn">✕</button>
+  
+  <!-- ⚠️ ՓՈՂՈՑՆԵՐԻ ՑԱՆԿ -->
+  <div id="streetsLegend">
+    <h3>📋 Փողոցները</h3>
+    <div id="streetsList"></div>
+  </div>
+  
+  <!-- ⚠️ ԸՆՏՐՎԱԾ ՓՈՂՈՑԻ ԻՆՖՈՐՄԱՑԻԱ -->
+  <div id="streetInfo">
+    <h3 id="streetInfoName">—</h3>
+    <div id="streetInfoPoints"></div>
+  </div>
+</div>
 
 <script type="importmap">
 {
@@ -345,6 +637,8 @@ body {
     "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
   }
 }
+
+
 </script>
 
 <script type="module">
@@ -381,7 +675,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 // ========== SCENE ==========
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
-scene.fog = new THREE.Fog(0x87ceeb, 100, 240);
+scene.fog = new THREE.Fog(0x87ceeb, 400, 1500);
 
 // ========== CAMERA (2.5D Isometric) ==========
 const camera = new THREE.PerspectiveCamera(
@@ -471,334 +765,629 @@ window.addEventListener('resize', () => {
 });
 
 /* ============================================================
-   ՄԱՍ 3 — STREETS + SIDEWALKS + ROAD MARKINGS
-   Մայթերը ԿՏՐՎԱԾ են խաչմերուկներում
+   ՄԱՍ 3A — STREETS (ՎԵՐՋՆԱԿԱՆ, ըստ նկարի)
    ============================================================ */
 
-// ========== STREET NETWORK ==========
 const STREETS = [
-  { x1: -100, x2: 100, z1: -7,  z2: 7,   width: 14, type: 'avenue' },
-  { x1: -100, x2: 100, z1: -41, z2: -31, width: 10, type: 'main' },
-  { x1: -100, x2: 100, z1: -75, z2: -68, width: 7,  type: 'small' },
-  { x1: -100, x2: 100, z1: 31,  z2: 41,  width: 10, type: 'main' },
-  { x1: -100, x2: 100, z1: 68,  z2: 75,  width: 7,  type: 'small' },
 
-  { z1: -100, z2: 100, x1: -7,  x2: 7,   width: 14, type: 'avenue' },
-  { z1: -100, z2: 100, x1: -41, x2: -31, width: 10, type: 'main' },
-  { z1: -100, z2: 100, x1: -75, x2: -68, width: 7,  type: 'small' },
-  { z1: -100, z2: 100, x1: 31,  x2: 41,  width: 10, type: 'main' },
-  { z1: -100, z2: 100, x1: 68,  x2: 75,  width: 7,  type: 'small' },
+  // ============================================================
+  // 1. ԱԲՈՎՅԱՆ — կենտրոնական, ուղիղ
+  // ============================================================
+  {
+    name: 'Աբովյան',
+    type: 'avenue',
+    width: 30,
+    points: [
+      { x: 0, z: -450 },   // Կասկադի մոտ
+      { x: 0, z: -200 },
+      { x: 0, z: 0 },
+      { x: 0, z: 200 },
+      { x: 0, z: 450 },
+    ]
+  },
+
+  // ============================================================
+  // 2. ՄԱՇՏՈՑԻ — կենտրոնից ձախ, ուղիղ
+  // ============================================================
+  {
+    name: 'Մաշտոցի',
+    type: 'avenue',
+    width: 25,
+    points: [
+      { x: -200, z: -450 },
+      { x: -200, z: -200 },
+      { x: -200, z: 0 },
+      { x: -200, z: 200 },
+      { x: -200, z: 450 },
+    ]
+  },
+
+  // ============================================================
+  // 3. ՀՅՈՒՍԻՍԱՅԻՆ ՊՈՂՈՏԱ — կենտրոնից աջ
+  // ============================================================
+  {
+    name: 'Հյուսիսային',
+    type: 'avenue',
+    width: 28,
+    points: [
+      { x: 250, z: -450 },
+      { x: 250, z: -200 },
+      { x: 250, z: 0 },
+      { x: 250, z: 200 },
+      { x: 250, z: 450 },
+    ]
+  },
+
+  // ============================================================
+  // 4. ԱՐԱՄԻ — ամենաաջ
+  // ============================================================
+  {
+    name: 'Արամի',
+    type: 'main',
+    width: 22,
+    points: [
+      { x: 450, z: -450 },
+      { x: 450, z: 0 },
+      { x: 450, z: 450 },
+    ]
+  },
+
+  // ============================================================
+  // 5. ԱՄԵՆԱՁԱԽ — ամենաձախ
+  // ============================================================
+  {
+    name: 'Ամենաձախ',
+    type: 'main',
+    width: 22,
+    points: [
+      { x: -600, z: -450 },
+      { x: -600, z: 0 },
+      { x: -600, z: 450 },
+    ]
+  },
+
+  // ============================================================
+  // 6. ԿԱՍԿԱԴԻ ՄԱՏՈՒՅՑ — հորիզոնական, Կասկադի դիմաց
+  // ============================================================
+  // Կասկադը (0, -600)։ Փողոցը → z = -450
+  {
+    name: 'Կասկադի մատույց',
+    type: 'main',
+    width: 25,
+    points: [
+      { x: -250, z: -450 },
+      { x: 0, z: -450 },
+      { x: 250, z: -450 },
+      { x: 450, z: -450 },
+    ]
+  },
+
+  // ============================================================
+  // 7. ՀՐԱՊԱՐԱԿԻ ԱՌԱՆՑՔ — հորիզոնական, z = 0
+  // ============================================================
+  // Հրապարակի (0,0) հորիզոնական առանցք
+  {
+    name: 'Հրապարակի առանցք',
+    type: 'main',
+    width: 25,
+    points: [
+      { x: -600, z: 0 },
+      { x: -350, z: 0 },   // Ազգային պատկերասրահից հեռու
+      { x: -150, z: 0 },   // Հրապարակից 150մ
+      { x: 150, z: 0 },    // Հրապարակից 150մ
+      { x: 450, z: 0 },
+      { x: 600, z: 0 },
+    ]
+  },
+
+  // ============================================================
+  // 8. ՀՐԱՊԱՐԱԿԻ ՕՂԱԿ — 140մ շառավիղ
+  // ============================================================
+  {
+    name: 'Հրապարակի օղակ',
+    type: 'small',
+    width: 14,
+    points: (() => {
+      const points = [];
+      const radius = 140;
+      const steps = 20;
+      for (let i = 0; i <= steps; i++) {
+        const angle = (i / steps) * Math.PI * 2;
+        points.push({
+          x: Math.sin(angle) * radius,
+          z: Math.cos(angle) * radius
+        });
+      }
+      return points;
+    })()
+  },
+
+  // ============================================================
+  // 9. MARRIOTT/ԵՊՀ ԳԻԾ — հորիզոնական, z = 250
+  // ============================================================
+  // Marriott (0, 350), ԵՊՀ (350, 350)
+  {
+    name: 'Marriott-ԵՊՀ գիծ',
+    type: 'main',
+    width: 22,
+    points: [
+      { x: -250, z: 250 },
+      { x: 0, z: 250 },     // Marriott-ից 100մ հյուսիս
+      { x: 250, z: 250 },   // ԵՊՀ-ից 100մ հյուսիս
+      { x: 450, z: 250 },
+    ]
+  },
+
+  // ============================================================
+  // 10. ՀԱՐԱՎԱՅԻՆ ԳԻԾ — z = 450
+  // ============================================================
+  {
+    name: 'Հարավային գիծ',
+    type: 'main',
+    width: 22,
+    points: [
+      { x: -250, z: 450 },
+      { x: 0, z: 450 },
+      { x: 250, z: 450 },
+      { x: 450, z: 450 },
+    ]
+  },
+
+  // ============================================================
+  // 11. ՕՊԵՐԱՅԻ ՓՈՂՈՑ — ուղղահայաց, x = -200
+  // ============================================================
+  // Օպերա (-350, -100)։ Փողոցը → x = -200
+  // Այսինքն Օպերայի արևելքից անցնում է Մաշտոցին
+  // Օպերայի հարավից → միանում է Հրապարակի առանցքին
+  {
+    name: 'Օպերայի միացում',
+    type: 'small',
+    width: 15,
+    points: [
+      { x: -200, z: -100 },   // Մաշտոցիից
+      { x: -150, z: -100 },
+      { x: -100, z: -50 },
+      { x: -80, z: 0 },       // Հրապարակի առանցք
+    ]
+  },
+
+  // ============================================================
+  // 12. ՄԱՏԵՆԱԴԱՐԱՆԻ ՓՈՂՈՑ — հորիզոնական, z = -400
+  // ============================================================
+  // Մատենադարան (-450, -400)։ Փողոցը → z = -400
+  // Անցնում է Մատենադարանի արևելքով (x = -350)
+  {
+    name: 'Մատենադարանի միացում',
+    type: 'small',
+    width: 15,
+    points: [
+      { x: -600, z: -400 },
+      { x: -450, z: -400 },   // Մատենադարանից անմիջապես
+      { x: -300, z: -400 },   // Մաշտոցիից արևելք
+      { x: -200, z: -400 },   // Մաշտոցի
+    ]
+  },
+
+  // ============================================================
+  // 13. ԱԶԳԱՅԻՆ ՊԱՏԿԵՐԱՍՐԱՀԻ ՄԻԱՑՈՒՄ
+  // ============================================================
+  // Պատկերասրահ (-300, 50)։ Փողոցը → x = -180
+  {
+    name: 'Պատկերասրահի միացում',
+    type: 'small',
+    width: 15,
+    points: [
+      { x: -200, z: 50 },     // Մաշտոցիից
+      { x: -250, z: 50 },
+      { x: -300, z: 50 },     // Պատկերասրահի մոտ
+    ]
+  },
+
+  // ============================================================
+  // 14. ՀՅՈՒՍԻՍԱՅԻՆ-ԿԱՍԿԱԴ ՄԻԱՑՈՒՄ
+  // ============================================================
+  {
+    name: 'Հյուսիսային-Կասկադ',
+    type: 'small',
+    width: 15,
+    points: [
+      { x: 250, z: -450 },
+      { x: 150, z: -450 },
+      { x: 100, z: -450 },
+    ]
+  },
+
+  // ============================================================
+  // 15. ՄԻՋԱՆԿՅԱԼ 1 — z = -200
+  // ============================================================
+  {
+    name: 'Միջանկյալ 1',
+    type: 'small',
+    width: 12,
+    points: [
+      { x: -200, z: -200 },
+      { x: 0, z: -200 },
+      { x: 250, z: -200 },
+    ]
+  },
+
+  // ============================================================
+  // 16. ՄԻՋԱՆԿՅԱԼ 2 — z = 200
+  // ============================================================
+  {
+    name: 'Միջանկյալ 2',
+    type: 'small',
+    width: 12,
+    points: [
+      { x: -200, z: 200 },
+      { x: 0, z: 200 },
+      { x: 250, z: 200 },
+    ]
+  },
 ];
+
+/* ============================================================
+   ՄԱՍ 3B — ՓՈՂՈՑՆԵՐԻ ԳԾՈՒՄ (CatmullRomCurve3)
+   ============================================================ */
 
 // ========== MATERIALS ==========
-const streetMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.95 });
-const avenueMat = new THREE.MeshStandardMaterial({ color: 0x353535, roughness: 0.9 });
-const sidewalkMat = new THREE.MeshStandardMaterial({ color: 0xb8b8b8, roughness: 0.9 });
-const curbMat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.85 });
-const dashMat = new THREE.MeshStandardMaterial({
-  color: 0xffdd55, emissive: 0x443300, emissiveIntensity: 0.4, roughness: 0.6
+const avenueMat = new THREE.MeshStandardMaterial({
+  color: 0x2a2a2a, roughness: 0.9
 });
-const crosswalkMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 });
+const streetMat = new THREE.MeshStandardMaterial({
+  color: 0x3a3a3a, roughness: 0.95
+});
+const sidewalkMat = new THREE.MeshStandardMaterial({
+  color: 0xc4a484, roughness: 0.85
+});
+const curbMat = new THREE.MeshStandardMaterial({
+  color: 0x8a6a4a, roughness: 0.8
+});
+const dashMat = new THREE.MeshStandardMaterial({
+  color: 0xffdd55, emissive: 0x443300, emissiveIntensity: 0.4
+});
+const crosswalkMat = new THREE.MeshStandardMaterial({
+  color: 0xffffff, roughness: 0.8
+});
 
-// ========== SIDEWALK COLLISION DATA ==========
-const sidewalks = [];
+// ========== COLLISION ARRAYS ==========
+const roadMeshes = [];      // ամեն ճանապարհի mesh (collision-ի համար)
+const sidewalks = [];       // մայթերի collider-ներ (հետագա)
+const roadCurves = [];      // ամեն փողոցի curve + width
 
-// ========== ՓՈՂՈՑՆԵՐԻ ՄԵԾԱՑՈՒՄԸ ==========
-// Sidewalk-ը գծելիս ամեն փողոց «կտրում» ենք ուղղահայաց փողոցների տարածքում։
+// ========== CONSTANTS ==========
+const CURVE_SEGMENTS = 40;       // Քանի՞ ուղիղ հատված ամեն կորի համար
+const SIDEWALK_WIDTH = 2;         // Մայթի լայնությունը (մետր)
+const SIDEWALK_HEIGHT = 0.3;      // Մայթի բարձրությունը
+const ROAD_Y = 0.05;              // Ճանապարհի y-ը
 
-const SIDEWALK_WIDTH = 1.5;
-const SIDEWALK_HEIGHT = 0.25;
+// ============================================================
+// ԳԾՈՒՄ ԵՆՔ ՓՈՂՈՑՆԵՐԸ
+// ============================================================
 
-// Ուղղահայաց փողոցների x-միջակայքերը (bացվածքների համար)
-const VERTICAL_GAPS = [
-  { min: -7 - SIDEWALK_WIDTH, max: 7 + SIDEWALK_WIDTH },     // avenue
-  { min: -41 - SIDEWALK_WIDTH, max: -31 + SIDEWALK_WIDTH },   // main
-  { min: -75 - SIDEWALK_WIDTH, max: -68 + SIDEWALK_WIDTH },   // small
-  { min: 31 - SIDEWALK_WIDTH, max: 41 + SIDEWALK_WIDTH },     // main
-  { min: 68 - SIDEWALK_WIDTH, max: 75 + SIDEWALK_WIDTH },     // small
-];
+STREETS.forEach(street => {
+  // 1. Կետերը → Vector3
+  const points3D = street.points.map(p => new THREE.Vector3(p.x, 0, p.z));
 
-// Հորիզոնական փողոցների z-միջակայքերը
-const HORIZONTAL_GAPS = [
-  { min: -7 - SIDEWALK_WIDTH, max: 7 + SIDEWALK_WIDTH },
-  { min: -41 - SIDEWALK_WIDTH, max: -31 + SIDEWALK_WIDTH },
-  { min: -75 - SIDEWALK_WIDTH, max: -68 + SIDEWALK_WIDTH },
-  { min: 31 - SIDEWALK_WIDTH, max: 41 + SIDEWALK_WIDTH },
-  { min: 68 - SIDEWALK_WIDTH, max: 75 + SIDEWALK_WIDTH },
-];
+  // 2. Ստեղծում ենք CatmullRomCurve3
+  // ⚠️ closed = false, որովհետև փողոցները բաց են
+  const curve = new THREE.CatmullRomCurve3(points3D, false, 'catmullrom', 0.5);
 
-// Ֆունկցիա՝ վերադարձնում է [start, end] հատվածների զանգված՝
-// բաց թողնելով gaps-ի տարածքները
-function splitSegment(start, end, gaps) {
-  const segments = [];
-  let cursor = start;
+  // 3. Վերցնում ենք 40 կետ կորի վրա
+  const curvePoints = curve.getPoints(CURVE_SEGMENTS);
 
-  // Դասավորում ենք gaps-ը ըստ min-ի
-  const sorted = [...gaps].sort((a, b) => a.min - b.min);
+  // 4. Ամեն 2 հարակից կետի միջև ստեղծում ենք ուղիղ հատված (road segment)
+  const roadMat = street.type === 'avenue' ? avenueMat : streetMat;
+  const roadWidth = street.width;
 
-  for (const g of sorted) {
-    if (g.max <= cursor) continue;
-    if (g.min >= end) break;
+  for (let i = 0; i < curvePoints.length - 1; i++) {
+    const p1 = curvePoints[i];
+    const p2 = curvePoints[i + 1];
 
-    const segEnd = Math.max(cursor, g.min);
-    if (segEnd > cursor) {
-      segments.push({ start: cursor, end: segEnd });
-    }
-    cursor = Math.max(cursor, g.max);
-  }
+    // Հատվածի երկարությունը
+    const dx = p2.x - p1.x;
+    const dz = p2.z - p1.z;
+    const segmentLength = Math.sqrt(dx * dx + dz * dz);
 
-  if (cursor < end) {
-    segments.push({ start: cursor, end: end });
-  }
+    if (segmentLength < 0.01) continue;  // Շատ կարճ հատվածները բաց ենք թողնում
 
-  return segments;
-}
+    // Անկյունը (heading) այս հատվածի համար
+    const heading = Math.atan2(dx, dz);
 
-// ========== BUILD STREETS ==========
-STREETS.forEach(s => {
-  const w = s.x2 - s.x1;
-  const d = s.z2 - s.z1;
-  const cx = (s.x1 + s.x2) / 2;
-  const cz = (s.z1 + s.z2) / 2;
-  const isHorizontal = w > d;
+    // Հատվածի կենտրոնը
+    const cx = (p1.x + p2.x) / 2;
+    const cz = (p1.z + p2.z) / 2;
 
-  // --- Road surface ---
-  const roadMat = s.type === 'avenue' ? avenueMat : streetMat;
-  const road = new THREE.Mesh(
-    new THREE.BoxGeometry(w, 0.05, d),
-    roadMat
-  );
-  road.position.set(cx, 0.03, cz);
-  road.receiveShadow = true;
-  scene.add(road);
+    // Ստեղծում ենք road segment (ուղղանկյուն)
+    const segment = new THREE.Mesh(
+      new THREE.BoxGeometry(roadWidth, 0.1, segmentLength),
+      roadMat
+    );
+    segment.position.set(cx, ROAD_Y, cz);
+    segment.rotation.y = heading;
+    segment.receiveShadow = true;
+    scene.add(segment);
 
-  // --- Sidewalks (ԿՏՐՎԱԾ) ---
-  if (isHorizontal) {
-    // Հորիզոնական փողոցի մայթերը ձգվում են x-ով,
-    // բաց թողնելով VERTICAL_GAPS-ը
-    const segments = splitSegment(s.x1, s.x2, VERTICAL_GAPS);
-
-    // Հյուսիսային մայթ (z = s.z1 - sw-ից մինչև s.z1)
-    // Հարավային մայթ (z = s.z2-ից մինչև s.z2 + sw)
-    segments.forEach(seg => {
-      const segW = seg.end - seg.start;
-      const segCx = (seg.start + seg.end) / 2;
-
-      // Հյուսիս
-      const n = new THREE.Mesh(
-        new THREE.BoxGeometry(segW, SIDEWALK_HEIGHT, SIDEWALK_WIDTH),
-        sidewalkMat
-      );
-      n.position.set(segCx, SIDEWALK_HEIGHT / 2, s.z1 - SIDEWALK_WIDTH / 2);
-      n.receiveShadow = true;
-      n.castShadow = true;
-      scene.add(n);
-
-      // Հարավ
-      const so = new THREE.Mesh(
-        new THREE.BoxGeometry(segW, SIDEWALK_HEIGHT, SIDEWALK_WIDTH),
-        sidewalkMat
-      );
-      so.position.set(segCx, SIDEWALK_HEIGHT / 2, s.z2 + SIDEWALK_WIDTH / 2);
-      so.receiveShadow = true;
-      so.castShadow = true;
-      scene.add(so);
-
-      // Collision
-      sidewalks.push({
-        minX: seg.start, maxX: seg.end,
-        minZ: s.z1 - SIDEWALK_WIDTH, maxZ: s.z1
-      });
-      sidewalks.push({
-        minX: seg.start, maxX: seg.end,
-        minZ: s.z2, maxZ: s.z2 + SIDEWALK_WIDTH
-      });
-
-      // Curb — հյուսիս
-      const c1 = new THREE.Mesh(
-        new THREE.BoxGeometry(segW, 0.3, 0.15),
-        curbMat
-      );
-      c1.position.set(segCx, 0.15, s.z1 - 0.075);
-      c1.castShadow = true;
-      scene.add(c1);
-
-      // Curb — հարավ
-      const c2 = new THREE.Mesh(
-        new THREE.BoxGeometry(segW, 0.3, 0.15),
-        curbMat
-      );
-      c2.position.set(segCx, 0.15, s.z2 + 0.075);
-      c2.castShadow = true;
-      scene.add(c2);
-    });
-  } else {
-    // Ուղղահայաց փողոցի մայթերը ձգվում են z-ով,
-    // բաց թողնելով HORIZONTAL_GAPS-ը
-    const segments = splitSegment(s.z1, s.z2, HORIZONTAL_GAPS);
-
-    segments.forEach(seg => {
-      const segD = seg.end - seg.start;
-      const segCz = (seg.start + seg.end) / 2;
-
-      // Արևմտյան մայթ (x = s.x1 - sw-ից մինչև s.x1)
-      const wst = new THREE.Mesh(
-        new THREE.BoxGeometry(SIDEWALK_WIDTH, SIDEWALK_HEIGHT, segD),
-        sidewalkMat
-      );
-      wst.position.set(s.x1 - SIDEWALK_WIDTH / 2, SIDEWALK_HEIGHT / 2, segCz);
-      wst.receiveShadow = true;
-      wst.castShadow = true;
-      scene.add(wst);
-
-      // Արևելյան մայթ
-      const est = new THREE.Mesh(
-        new THREE.BoxGeometry(SIDEWALK_WIDTH, SIDEWALK_HEIGHT, segD),
-        sidewalkMat
-      );
-      est.position.set(s.x2 + SIDEWALK_WIDTH / 2, SIDEWALK_HEIGHT / 2, segCz);
-      est.receiveShadow = true;
-      est.castShadow = true;
-      scene.add(est);
-
-      // Collision
-      sidewalks.push({
-        minX: s.x1 - SIDEWALK_WIDTH, maxX: s.x1,
-        minZ: seg.start, maxZ: seg.end
-      });
-      sidewalks.push({
-        minX: s.x2, maxX: s.x2 + SIDEWALK_WIDTH,
-        minZ: seg.start, maxZ: seg.end
-      });
-
-      // Curb — արևմուտք
-      const c1 = new THREE.Mesh(
-        new THREE.BoxGeometry(0.15, 0.3, segD),
-        curbMat
-      );
-      c1.position.set(s.x1 - 0.075, 0.15, segCz);
-      c1.castShadow = true;
-      scene.add(c1);
-
-      // Curb — արևելք
-      const c2 = new THREE.Mesh(
-        new THREE.BoxGeometry(0.15, 0.3, segD),
-        curbMat
-      );
-      c2.position.set(s.x2 + 0.075, 0.15, segCz);
-      c2.castShadow = true;
-      scene.add(c2);
+    // Պահում ենք collision-ի համար
+    roadMeshes.push({
+      x: cx,
+      z: cz,
+      heading: heading,
+      length: segmentLength,
+      width: roadWidth,
+      // AABB մոտավորություն (հետագա collision-ի համար)
+      minX: Math.min(p1.x, p2.x) - roadWidth / 2,
+      maxX: Math.max(p1.x, p2.x) + roadWidth / 2,
+      minZ: Math.min(p1.z, p2.z) - roadWidth / 2,
+      maxZ: Math.max(p1.z, p2.z) + roadWidth / 2
     });
   }
 
-  // --- Center dashed line ---
-  if (s.type === 'avenue' || s.type === 'main') {
-    const length = Math.max(w, d);
-    const dashCount = Math.floor(length / 8);
-    const dashLength = 3;
+  // 5. Պահում ենք curve-ը (հետագա sidewalks-ի համար)
+  roadCurves.push({
+    name: street.name,
+    curve: curve,
+    points: curvePoints,
+    width: street.width,
+    type: street.type
+  });
 
-    for (let i = 0; i < dashCount; i++) {
-      const t = (i + 0.5) / dashCount;
+  // ============================================================
+  // 6. ԿԵՆՏՐՈՆԱԿԱՆ ԳԾԵՐ (dashed line) — միայն avenue-ի և main-ի
+  // ============================================================
+  if (street.type === 'avenue' || street.type === 'main') {
+    for (let i = 0; i < curvePoints.length - 1; i += 4) {
+      // Ամեն 4-րդ կետից մեկ dashed line
+      const p1 = curvePoints[i];
+      const p2 = curvePoints[Math.min(i + 1, curvePoints.length - 1)];
+
+      const dx = p2.x - p1.x;
+      const dz = p2.z - p1.z;
+      const len = Math.sqrt(dx * dx + dz * dz);
+      if (len < 0.01) continue;
+
+      const heading = Math.atan2(dx, dz);
+      const cx = (p1.x + p2.x) / 2;
+      const cz = (p1.z + p2.z) / 2;
+
       const dash = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          isHorizontal ? dashLength : 0.2,
-          0.06,
-          isHorizontal ? 0.2 : dashLength
-        ),
+        new THREE.BoxGeometry(0.4, 0.12, len * 0.6),
         dashMat
       );
-
-      if (isHorizontal) {
-        dash.position.set(s.x1 + w * t, 0.06, cz);
-      } else {
-        dash.position.set(cx, 0.06, s.z1 + d * t);
-      }
+      dash.position.set(cx, ROAD_Y + 0.05, cz);
+      dash.rotation.y = heading;
       scene.add(dash);
     }
   }
+});
 
-  // --- Avenue side lines ---
-  if (s.type === 'avenue') {
-    const lineMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff, emissive: 0x333333, emissiveIntensity: 0.2
+// ============================================================
+// 7. ՀՐԱՊԱՐԱԿԻ ՀՐԱՊԱՐԱԿԱԳՐԱԿԱՆ ՄԱԿԵՐԵՍ
+// ============================================================
+// Կլոր սալիկ Հանրապետության հրապարակի կենտրոնում
+(function addRepublicSquareFloor() {
+  const square = new THREE.Mesh(
+    new THREE.CylinderGeometry(100, 100, 0.5, 48),
+    new THREE.MeshStandardMaterial({
+      color: 0xd4b48a,
+      roughness: 0.7
+    })
+  );
+  square.position.set(0, 0.25, 0);
+  square.receiveShadow = true;
+  scene.add(square);
+})();
+
+// ============================================================
+// 8. ՍՏՈՒԳՈՒՄ ԵՆՔ
+// ============================================================
+console.log(`✅ 3B: Գծվեց ${roadMeshes.length} ճանապարհի հատված`);
+console.log(`✅ 3B: ${roadCurves.length} փողոց`);
+
+/* ============================================================
+   ՄԱՍ 3C — SIDEWALKS + CROSSWALKS + STREET LIGHTS (ՈՒՂՂՎԱԾ)
+   ============================================================ */
+
+// ============================================================
+// 1. SIDEWALKS — մայթեր ամեն փողոցի 2 կողմից
+// ============================================================
+roadCurves.forEach(street => {
+  const halfWidth = street.width / 2;
+  const points = street.points;
+
+  for (let i = 0; i < points.length - 1; i++) {
+    const p1 = points[i];
+    const p2 = points[i + 1];
+
+    const dx = p2.x - p1.x;
+    const dz = p2.z - p1.z;
+    const segLen = Math.sqrt(dx * dx + dz * dz);
+    if (segLen < 0.01) continue;
+
+    const heading = Math.atan2(dx, dz);
+
+    const cx = (p1.x + p2.x) / 2;
+    const cz = (p1.z + p2.z) / 2;
+
+    const perpX = Math.cos(heading);
+    const perpZ = -Math.sin(heading);
+
+    const rightX = cx + perpX * (halfWidth + SIDEWALK_WIDTH / 2);
+    const rightZ = cz + perpZ * (halfWidth + SIDEWALK_WIDTH / 2);
+
+    const leftX = cx - perpX * (halfWidth + SIDEWALK_WIDTH / 2);
+    const leftZ = cz - perpZ * (halfWidth + SIDEWALK_WIDTH / 2);
+
+    // Աջ մայթ
+    const rightSidewalk = new THREE.Mesh(
+      new THREE.BoxGeometry(SIDEWALK_WIDTH, SIDEWALK_HEIGHT, segLen),
+      sidewalkMat
+    );
+    rightSidewalk.position.set(rightX, SIDEWALK_HEIGHT / 2, rightZ);
+    rightSidewalk.rotation.y = heading;
+    rightSidewalk.receiveShadow = true;
+    rightSidewalk.castShadow = true;
+    scene.add(rightSidewalk);
+
+    // Ձախ մայթ
+    const leftSidewalk = new THREE.Mesh(
+      new THREE.BoxGeometry(SIDEWALK_WIDTH, SIDEWALK_HEIGHT, segLen),
+      sidewalkMat
+    );
+    leftSidewalk.position.set(leftX, SIDEWALK_HEIGHT / 2, leftZ);
+    leftSidewalk.rotation.y = heading;
+    leftSidewalk.receiveShadow = true;
+    leftSidewalk.castShadow = true;
+    scene.add(leftSidewalk);
+
+    // Collision-ի տվյալներ
+    sidewalks.push({
+      x: rightX, z: rightZ, heading,
+      w: SIDEWALK_WIDTH, d: segLen
+    });
+    sidewalks.push({
+      x: leftX, z: leftZ, heading,
+      w: SIDEWALK_WIDTH, d: segLen
     });
 
-    if (isHorizontal) {
-      const line1 = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, 0.15), lineMat);
-      line1.position.set(cx, 0.06, s.z1 + 0.5);
-      scene.add(line1);
+    // Curb — աջ
+    const rightCurb = new THREE.Mesh(
+      new THREE.BoxGeometry(0.2, 0.35, segLen),
+      curbMat
+    );
+    rightCurb.position.set(
+      cx + perpX * halfWidth,
+      0.175,
+      cz + perpZ * halfWidth
+    );
+    rightCurb.rotation.y = heading;
+    rightCurb.castShadow = true;
+    scene.add(rightCurb);
 
-      const line2 = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, 0.15), lineMat);
-      line2.position.set(cx, 0.06, s.z2 - 0.5);
-      scene.add(line2);
-    } else {
-      const line1 = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.06, d), lineMat);
-      line1.position.set(s.x1 + 0.5, 0.06, cz);
-      scene.add(line1);
-
-      const line2 = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.06, d), lineMat);
-      line2.position.set(s.x2 - 0.5, 0.06, cz);
-      scene.add(line2);
-    }
+    // Curb — ձախ
+    const leftCurb = new THREE.Mesh(
+      new THREE.BoxGeometry(0.2, 0.35, segLen),
+      curbMat
+    );
+    leftCurb.position.set(
+      cx - perpX * halfWidth,
+      0.175,
+      cz - perpZ * halfWidth
+    );
+    leftCurb.rotation.y = heading;
+    leftCurb.castShadow = true;
+    scene.add(leftCurb);
   }
 });
 
-// ========== CROSSWALKS AT INTERSECTIONS ==========
+// ============================================================
+// 2. INTERSECTIONS — խաչմերուկների հայտնաբերում
+// ============================================================
 const intersections = [];
 
-const hStreets = STREETS.filter(s => (s.x2 - s.x1) > (s.z2 - s.z1));
-const vStreets = STREETS.filter(s => (s.z2 - s.z1) > (s.x2 - s.x1));
+for (let i = 0; i < roadCurves.length; i++) {
+  for (let j = i + 1; j < roadCurves.length; j++) {
+    const curveA = roadCurves[i];
+    const curveB = roadCurves[j];
 
-hStreets.forEach(h => {
-  vStreets.forEach(v => {
-    intersections.push({
-      x: (v.x1 + v.x2) / 2,
-      z: (h.z1 + h.z2) / 2,
-      hw: (v.x2 - v.x1) / 2,
-      hh: (h.z2 - h.z1) / 2
-    });
+    for (let a = 0; a < curveA.points.length - 1; a++) {
+      const p1 = curveA.points[a];
+      const p2 = curveA.points[a + 1];
+
+      for (let b = 0; b < curveB.points.length - 1; b++) {
+        const p3 = curveB.points[b];
+        const p4 = curveB.points[b + 1];
+
+        const intersection = lineIntersection(p1, p2, p3, p4);
+        if (intersection) {
+          const t1 = intersection.t1;
+          const t2 = intersection.t2;
+          if (t1 > 0.1 && t1 < 0.9 && t2 > 0.1 && t2 < 0.9) {
+            intersections.push({
+              x: intersection.x,
+              z: intersection.z,
+              curveA: curveA,
+              curveB: curveB,
+              width: Math.max(curveA.width, curveB.width)
+            });
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================
+// 3. LINE INTERSECTION
+// ============================================================
+function lineIntersection(p1, p2, p3, p4) {
+  const d1x = p2.x - p1.x;
+  const d1z = p2.z - p1.z;
+  const d2x = p4.x - p3.x;
+  const d2z = p4.z - p3.z;
+
+  const denom = d1x * d2z - d1z * d2x;
+  if (Math.abs(denom) < 0.001) return null;
+
+  const t1 = ((p3.x - p1.x) * d2z - (p3.z - p1.z) * d2x) / denom;
+  const t2 = ((p3.x - p1.x) * d1z - (p3.z - p1.z) * d1x) / denom;
+
+  if (t1 < 0 || t1 > 1 || t2 < 0 || t2 > 1) return null;
+
+  return {
+    x: p1.x + t1 * d1x,
+    z: p1.z + t1 * d1z,
+    t1, t2
+  };
+}
+
+// ============================================================
+// 4. CROSSWALKS — zebra-ներ խաչմերուկներում
+// ============================================================
+intersections.forEach(inter => {
+  const zebraCount = 4;
+  const zebraWidth = 0.8;
+  const zebraGap = 0.6;
+
+  const directions = [
+    { dx: 0, dz: -1 },
+    { dx: 0, dz: 1 },
+    { dx: -1, dz: 0 },
+    { dx: 1, dz: 0 }
+  ];
+
+  directions.forEach(dir => {
+    const baseOffset = inter.width / 2 + 3;
+    const centerX = inter.x + dir.dx * baseOffset;
+    const centerZ = inter.z + dir.dz * baseOffset;
+
+    for (let i = 0; i < zebraCount; i++) {
+      const offset = (i - (zebraCount - 1) / 2) * (zebraWidth + zebraGap);
+
+      const isHorizontal = dir.dz !== 0;
+
+      const zebra = new THREE.Mesh(
+        new THREE.BoxGeometry(
+          isHorizontal ? zebraWidth : 4,
+          0.12,
+          isHorizontal ? 4 : zebraWidth
+        ),
+        crosswalkMat
+      );
+
+      if (isHorizontal) {
+        zebra.position.set(centerX + offset, ROAD_Y + 0.08, centerZ);
+      } else {
+        zebra.position.set(centerX, ROAD_Y + 0.08, centerZ + offset);
+      }
+      scene.add(zebra);
+    }
   });
 });
 
-intersections.forEach(inter => {
-  const stripeCount = 4;
-  const stripeW = 0.7;
-  const stripeGap = 0.6;
-
-  for (let i = 0; i < stripeCount; i++) {
-    const offset = (i - (stripeCount - 1) / 2) * (stripeW + stripeGap);
-
-    const z1 = new THREE.Mesh(
-      new THREE.BoxGeometry(stripeW, 0.07, inter.hh * 0.8),
-      crosswalkMat
-    );
-    z1.position.set(inter.x + offset, 0.07, inter.z - inter.hh - 1.5);
-    scene.add(z1);
-
-    const z2 = new THREE.Mesh(
-      new THREE.BoxGeometry(stripeW, 0.07, inter.hh * 0.8),
-      crosswalkMat
-    );
-    z2.position.set(inter.x + offset, 0.07, inter.z + inter.hh + 1.5);
-    scene.add(z2);
-
-    const z3 = new THREE.Mesh(
-      new THREE.BoxGeometry(inter.hw * 0.8, 0.07, stripeW),
-      crosswalkMat
-    );
-    z3.position.set(inter.x - inter.hw - 1.5, 0.07, inter.z + offset);
-    scene.add(z3);
-
-    const z4 = new THREE.Mesh(
-      new THREE.BoxGeometry(inter.hw * 0.8, 0.07, stripeW),
-      crosswalkMat
-    );
-    z4.position.set(inter.x + inter.hw + 1.5, 0.07, inter.z + offset);
-    scene.add(z4);
-  }
-});
-
-// ========== STREET LIGHTS ==========
+// ============================================================
+// 5. STREET LIGHTS
+// ============================================================
 const poleMat = new THREE.MeshStandardMaterial({
   color: 0x2a2a2a, roughness: 0.7, metalness: 0.5
 });
@@ -815,47 +1404,116 @@ intersections.forEach(inter => {
   ];
 
   corners.forEach(c => {
-    const px = inter.x + c.dx * (inter.hw + 1.2);
-    const pz = inter.z + c.dz * (inter.hh + 1.2);
+    const offset = inter.width / 2 + 3;
+    const px = inter.x + c.dx * offset;
+    const pz = inter.z + c.dz * offset;
 
     const pole = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.12, 0.15, 6, 8),
+      new THREE.CylinderGeometry(0.15, 0.2, 8, 8),
       poleMat
     );
-    pole.position.set(px, 3, pz);
+    pole.position.set(px, 4, pz);
     pole.castShadow = true;
     scene.add(pole);
 
     const lamp = new THREE.Mesh(
-      new THREE.SphereGeometry(0.4, 12, 12),
+      new THREE.SphereGeometry(0.5, 12, 12),
       lampMat
     );
-    lamp.position.set(px, 6.2, pz);
+    lamp.position.set(px, 8.2, pz);
     scene.add(lamp);
   });
 });
 
+// ============================================================
+// 6. ՀՐԱՊԱՐԱԿԻ ԿԵՆՏՐՈՆԱԿԱՆ ՇԱՏՐՎԱՆԸ
+// ============================================================
+// ⚠️ ԱՌԱՆՑ landmarks.push-ի։ Collider-ը կավելանա 4A-ում։
+
+(function addFountain() {
+  const x = 0;
+  const z = 0;
+
+  // Հիմք
+  const base = new THREE.Mesh(
+    new THREE.CylinderGeometry(18, 20, 3, 32),
+    new THREE.MeshStandardMaterial({ color: 0xa89070, roughness: 0.6 })
+  );
+  base.position.set(x, 1.5, z);
+  base.castShadow = true;
+  base.receiveShadow = true;
+  scene.add(base);
+
+  // Ջրի մակերես
+  const water = new THREE.Mesh(
+    new THREE.CylinderGeometry(16, 16, 1.5, 32),
+    new THREE.MeshStandardMaterial({
+      color: 0x4facfe,
+      emissive: 0x2266aa,
+      emissiveIntensity: 0.5,
+      transparent: true,
+      opacity: 0.8
+    })
+  );
+  water.position.set(x, 3.5, z);
+  scene.add(water);
+
+  // Կենտրոնական սյուն
+  const centerColumn = new THREE.Mesh(
+    new THREE.CylinderGeometry(2, 3, 6, 16),
+    new THREE.MeshStandardMaterial({ color: 0xa89070, roughness: 0.6 })
+  );
+  centerColumn.position.set(x, 6, z);
+  centerColumn.castShadow = true;
+  scene.add(centerColumn);
+
+  // Գնդիկ վերևում
+  const orb = new THREE.Mesh(
+    new THREE.SphereGeometry(1.5, 12, 12),
+    new THREE.MeshStandardMaterial({
+      color: 0x4facfe,
+      emissive: 0x2266aa,
+      emissiveIntensity: 0.8
+    })
+  );
+  orb.position.set(x, 10, z);
+  scene.add(orb);
+
+  // ⚠️ Պահում ենք collider-ը գլոբալ փոփոխականում
+  // 4A-ում կավելացնենք landmarks-ին
+  window.__fountainCollider = {
+    minX: x - 20, maxX: x + 20,
+    minZ: z - 20, maxZ: z + 20
+  };
+})();
+
+// ============================================================
+// 7. ՍՏՈՒԳՈՒՄ
+// ============================================================
+console.log(`✅ 3C: ${sidewalks.length} մայթ`);
+console.log(`✅ 3C: ${intersections.length} խաչմերուկ`);
+
+
 /* ============================================================
-   ՄԱՍ 4 — BUILDINGS + LANDMARKS (ՎԵՐՋՆԱԿԱՆ)
+   ՄԱՍ 4A — BUILDING COLORS + addBuilding() + ՖՈՆԱՅԻՆ ՇԵՆՔԵՐ
    ============================================================ */
 
 // ========== BUILDING COLORS ==========
 const buildingColors = [
   0xd4a373, 0xccd5ae, 0xe9edc9, 0xfaedcd,
   0xb08968, 0xa68a6d, 0xc9ada7, 0xe8d5b7,
-  0xd9bfa3, 0xc4a484, 0xbfa980, 0xe6d5b8
+  0xd9bfa3, 0xc4a484, 0xbfa980, 0xe6d5b8,
+  0x8b6b4a, 0xa88868, 0x9b7a5a
 ];
 
 const roofColors = [0x8b5a3c, 0x6b4423, 0x7a5c3f, 0x5c4033];
 
 // ========== COLLISION ARRAYS ==========
-// Շենքերի կոլիզիայի տվյալներ
 const buildings = [];
-
-// Landmark-ների կոլիզիայի տվյալներ (առանձին)
 const landmarks = [];
 
 // ========== BUILDING FACTORY ==========
+// Նույն ֆունկցիան, ինչ հին կոդում, բայց հարմարեցված մեծ չափերի համար
 function addBuilding(x, z, w, d, h) {
   if (!isFinite(x) || !isFinite(z) || !isFinite(w) || !isFinite(d) || !isFinite(h)) {
     return;
@@ -877,75 +1535,78 @@ function addBuilding(x, z, w, d, h) {
 
   // --- Roof ---
   const roof = new THREE.Mesh(
-    new THREE.BoxGeometry(w + 0.6, 0.5, d + 0.6),
+    new THREE.BoxGeometry(w + 1, 1, d + 1),
     new THREE.MeshStandardMaterial({ color: roofColor, roughness: 0.85 })
   );
-  roof.position.set(x, h + 0.25, z);
+  roof.position.set(x, h + 0.5, z);
   roof.castShadow = true;
   scene.add(roof);
 
-  // --- Windows ---
-  const winMat = new THREE.MeshStandardMaterial({
-    color: 0x88ccff,
-    emissive: 0x224466,
-    emissiveIntensity: 0.5,
-    roughness: 0.2,
-    metalness: 0.3
-  });
+  // --- Windows (միայն 10մ-ից բարձր շենքերի) ---
+  if (h > 10) {
+    const winMat = new THREE.MeshStandardMaterial({
+      color: 0x88ccff,
+      emissive: 0x224466,
+      emissiveIntensity: 0.5,
+      roughness: 0.2,
+      metalness: 0.3
+    });
 
-  const winW = 1.2;
-  const winH = 1.6;
-  const winGapX = 2.8;
-  const winGapY = 3.2;
-  const rows = Math.max(0, Math.floor((h - 2) / winGapY));
-  const colsX = Math.max(0, Math.floor((w - 2) / winGapX));
-  const colsZ = Math.max(0, Math.floor((d - 2) / winGapX));
+    const winW = 2;
+    const winH = 2.5;
+    const winGapX = 5;
+    const winGapY = 5;
+    const rows = Math.max(0, Math.floor((h - 3) / winGapY));
+    const colsX = Math.max(0, Math.floor((w - 3) / winGapX));
+    const colsZ = Math.max(0, Math.floor((d - 3) / winGapX));
 
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < colsX; c++) {
-      const wx = x - w / 2 + 1.5 + c * winGapX;
-      const wy = 2.5 + r * winGapY;
+    // Առջև և հետև
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < colsX; c++) {
+        const wx = x - w / 2 + 3 + c * winGapX;
+        const wy = 4 + r * winGapY;
 
-      const winF = new THREE.Mesh(
-        new THREE.BoxGeometry(winW, winH, 0.1),
-        winMat
-      );
-      winF.position.set(wx, wy, z + d / 2 + 0.06);
-      scene.add(winF);
+        const winF = new THREE.Mesh(
+          new THREE.BoxGeometry(winW, winH, 0.2),
+          winMat
+        );
+        winF.position.set(wx, wy, z + d / 2 + 0.1);
+        scene.add(winF);
 
-      const winB = new THREE.Mesh(
-        new THREE.BoxGeometry(winW, winH, 0.1),
-        winMat
-      );
-      winB.position.set(wx, wy, z - d / 2 - 0.06);
-      scene.add(winB);
+        const winB = new THREE.Mesh(
+          new THREE.BoxGeometry(winW, winH, 0.2),
+          winMat
+        );
+        winB.position.set(wx, wy, z - d / 2 - 0.1);
+        scene.add(winB);
+      }
     }
-  }
 
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < colsZ; c++) {
-      const wz = z - d / 2 + 1.5 + c * winGapX;
-      const wy = 2.5 + r * winGapY;
+    // Ձախ և աջ
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < colsZ; c++) {
+        const wz = z - d / 2 + 3 + c * winGapX;
+        const wy = 4 + r * winGapY;
 
-      const winL = new THREE.Mesh(
-        new THREE.BoxGeometry(0.1, winH, winW),
-        winMat
-      );
-      winL.position.set(x - w / 2 - 0.06, wy, wz);
-      scene.add(winL);
+        const winL = new THREE.Mesh(
+          new THREE.BoxGeometry(0.2, winH, winW),
+          winMat
+        );
+        winL.position.set(x - w / 2 - 0.1, wy, wz);
+        scene.add(winL);
 
-      const winR = new THREE.Mesh(
-        new THREE.BoxGeometry(0.1, winH, winW),
-        winMat
-      );
-      winR.position.set(x + w / 2 + 0.06, wy, wz);
-      scene.add(winR);
+        const winR = new THREE.Mesh(
+          new THREE.BoxGeometry(0.2, winH, winW),
+          winMat
+        );
+        winR.position.set(x + w / 2 + 0.1, wy, wz);
+        scene.add(winR);
+      }
     }
   }
 
   // --- Collision data ---
   buildings.push({
-    x, z, w, d, h,
     minX: x - w / 2,
     maxX: x + w / 2,
     minZ: z - d / 2,
@@ -953,710 +1614,67 @@ function addBuilding(x, z, w, d, h) {
   });
 }
 
-// ========== GENERATE BUILDINGS IN BLOCKS ==========
-// Բլոկները համապատասխան են ՄԱՍ 3-ի փողոցներին։
-// X: -100..-75, -68..-41, -31..-7, 7..31, 41..68, 75..100
-// Z: նույնը
-
-const BLOCK_X = [
-  { min: -100, max: -75 },
-  { min: -68,  max: -41 },
-  { min: -31,  max: -7  },
-  { min: 7,    max: 31  },
-  { min: 41,   max: 68  },
-  { min: 75,   max: 100 }
-];
-
-const BLOCK_Z = [
-  { min: -100, max: -75 },
-  { min: -68,  max: -41 },
-  { min: -31,  max: -7  },
-  { min: 7,    max: 31  },
-  { min: 41,   max: 68  },
-  { min: 75,   max: 100 }
-];
-
-// ⚠️ Landmark-ների բլոկները բաց թողնելու համար
-// Cascade → (7..31, 7..31)
-// Opera   → (-68..-41, 41..68)
-// Matenadaran → (41..68, -68..-41)
-function isLandmarkBlock(bx, bz) {
-  // Cascade
-  if (bx.min === 7 && bx.max === 31 && bz.min === 7 && bz.max === 31) return true;
-  // Opera
-  if (bx.min === -68 && bx.max === -41 && bz.min === 41 && bz.max === 68) return true;
-  // Matenadaran
-  if (bx.min === 41 && bx.max === 68 && bz.min === -68 && bz.max === -41) return true;
-  return false;
-}
-
-BLOCK_X.forEach(bx => {
-  BLOCK_Z.forEach(bz => {
-    // Բաց թողնում ենք landmark-ների բլոկները
-    if (isLandmarkBlock(bx, bz)) return;
-
-    const blockW = bx.max - bx.min;
-    const blockD = bz.max - bz.min;
-
-    if (blockW < 6 || blockD < 6) return;
-
-    const cx = (bx.min + bx.max) / 2;
-    const cz = (bz.min + bz.max) / 2;
-
-    const margin = 2;
-    const usableW = blockW - margin * 2;
-    const usableD = blockD - margin * 2;
-
-    if (usableW < 4 || usableD < 4) return;
-
-    if (Math.random() < 0.7) {
-      const bw = usableW * 0.9;
-      const bd = usableD * 0.9;
-      const h = 8 + Math.random() * 14;
-      addBuilding(cx, cz, bw, bd, h);
-    } else {
-      const bw = usableW * 0.42;
-      const bd = usableD * 0.9;
-      const h1 = 6 + Math.random() * 10;
-      const h2 = 6 + Math.random() * 10;
-      const offset = usableW * 0.25;
-      addBuilding(cx - offset, cz, bw, bd, h1);
-      addBuilding(cx + offset, cz, bw, bd, h2);
-    }
-  });
-});
-
 // ============================================================
-// LANDMARK 1 — CASCADE (Կասկադ)
+// ՖՈՆԱՅԻՆ ՇԵՆՔԵՐ (ըստ նկարի՝ քաղաքի եզրերին)
 // ============================================================
-// Գտնվում է կենտրոնական բլոկում (7..31, 7..31)
-// 6 աստիճան, ամեն մեկը 20մ լայն, 3մ խոր, 2.5մ բարձր
+// Քաղաքի կենտրոնում (2000×2000 տարածք) կան landmarks։
+// Այս ֆոնային շենքերը լցնում են քաղաքի եզրերը։
 
-(function addCascade() {
-  const baseX = 19;
-  const baseZ = 19;
-  const steps = 6;
-  const stepMat = new THREE.MeshStandardMaterial({
-    color: 0xf5e6d3,
-    roughness: 0.8
-  });
-  const railMat = new THREE.MeshStandardMaterial({
-    color: 0xd4c4a8,
-    roughness: 0.7
+(function addBackgroundBuildings() {
+
+  // ԱՐԵՎՄՈՒՏՔ (ձախ կողմ)
+  // Մաշտոցի պողոտայից ձախ
+  const westSpots = [
+    { x: -500, z: -500 }, { x: -500, z: -350 }, { x: -500, z: -200 },
+    { x: -500, z: 50 },   { x: -500, z: 200 },  { x: -500, z: 350 },
+    { x: -500, z: 500 },
+    { x: -400, z: -500 }, { x: -400, z: 500 },
+    { x: -320, z: -500 }, { x: -320, z: -350 },
+    { x: -320, z: 200 },  { x: -320, z: 350 },  { x: -320, z: 500 },
+    { x: -250, z: -450 }, { x: -250, z: 450 },
+  ];
+
+  // ԱՐԵՎԵԼՔ (աջ կողմ)
+  // Արամի փողոցից աջ
+  const eastSpots = [
+    { x: 500, z: -500 }, { x: 500, z: -350 }, { x: 500, z: -200 },
+    { x: 500, z: 50 },   { x: 500, z: 200 },  { x: 500, z: 350 },
+    { x: 500, z: 500 },
+    { x: 420, z: -500 }, { x: 420, z: -350 },
+    { x: 420, z: 200 },  { x: 420, z: 500 },
+    { x: 580, z: -500 }, { x: 580, z: -350 }, { x: 580, z: 50 },
+    { x: 580, z: 200 },  { x: 580, z: 500 },
+  ];
+
+  // ՀՅՈՒՍԻՍ (վերև)
+  // Կասկադից վերև
+  const northSpots = [
+    { x: -300, z: -600 }, { x: -150, z: -600 },
+    { x: 150, z: -600 },  { x: 300, z: -600 },
+    { x: -450, z: -600 }, { x: 450, z: -600 },
+  ];
+
+  // ՀԱՐԱՎ (ներքև)
+  // Marriott-ից և ԵՊՀ-ից ներքև
+  const southSpots = [
+    { x: -300, z: 600 }, { x: -150, z: 600 },
+    { x: 150, z: 600 },  { x: 300, z: 600 },
+    { x: -450, z: 600 }, { x: 450, z: 600 },
+  ];
+
+  // Բոլոր շենքերը միացնում ենք
+  const allSpots = [...westSpots, ...eastSpots, ...northSpots, ...southSpots];
+
+  allSpots.forEach(spot => {
+    const w = 50 + Math.random() * 40;
+    const d = 50 + Math.random() * 40;
+    const h = 15 + Math.random() * 30;
+    addBuilding(spot.x, spot.z, w, d, h);
   });
 
-  for (let i = 0; i < steps; i++) {
-    const stepW = 20 - i * 2;
-    const stepH = 2.5;
-    const stepD = 3;
-
-    const step = new THREE.Mesh(
-      new THREE.BoxGeometry(stepW, stepH, stepD),
-      stepMat
-    );
-    step.position.set(baseX, stepH / 2 + i * stepH, baseZ - 8 + i * stepD);
-    step.castShadow = true;
-    step.receiveShadow = true;
-    scene.add(step);
-
-    const railL = new THREE.Mesh(
-      new THREE.BoxGeometry(0.6, 1.2, stepD),
-      railMat
-    );
-    railL.position.set(baseX - stepW / 2 + 0.3, stepH + i * stepH + 0.6, baseZ - 8 + i * stepD);
-    railL.castShadow = true;
-    scene.add(railL);
-
-    const railR = railL.clone();
-    railR.position.x = baseX + stepW / 2 - 0.3;
-    scene.add(railR);
-
-    // ✅ Ճշգրիտ collider ամեն աստիճանի համար
-    landmarks.push({
-      minX: baseX - stepW / 2,
-      maxX: baseX + stepW / 2,
-      minZ: baseZ - 8 + i * stepD - stepD / 2,
-      maxZ: baseZ - 8 + i * stepD + stepD / 2
-    });
-  }
 })();
 
-// ============================================================
-// LANDMARK 2 — OPERA (Օպերա)
-// ============================================================
-// Գտնվում է ձախ-ներքև բլոկում (-68..-41, 41..68)
 
-(function addOpera() {
-  const x = -54;
-  const z = 54;
-
-  const base = new THREE.Mesh(
-    new THREE.CylinderGeometry(10, 10, 3, 24),
-    new THREE.MeshStandardMaterial({ color: 0xe8d5b7, roughness: 0.8 })
-  );
-  base.position.set(x, 1.5, z);
-  base.castShadow = true;
-  base.receiveShadow = true;
-  scene.add(base);
-
-  const dome = new THREE.Mesh(
-    new THREE.SphereGeometry(10, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2),
-    new THREE.MeshStandardMaterial({ color: 0xc4a484, roughness: 0.7 })
-  );
-  dome.position.set(x, 3, z);
-  dome.castShadow = true;
-  scene.add(dome);
-
-  // ✅ Ճշգրիտ collider (շրջանագիծը որպես քառակուսի մոտարկում)
-  landmarks.push({
-    minX: x - 10,
-    maxX: x + 10,
-    minZ: z - 10,
-    maxZ: z + 10
-  });
-})();
-
-// ============================================================
-// LANDMARK 3 — MATENADARAN (Մատենադարան)
-// ============================================================
-// Գտնվում է աջ-վերև բլոկում (41..68, -68..-41)
-
-(function addMatenadaran() {
-  const x = 54;
-  const z = -54;
-
-  const base = new THREE.Mesh(
-    new THREE.BoxGeometry(18, 8, 14),
-    new THREE.MeshStandardMaterial({ color: 0xd9bfa3, roughness: 0.85 })
-  );
-  base.position.set(x, 4, z);
-
- /* ============================================================
-   ՄԱՍ 4 — BUILDINGS + LANDMARKS (ԵՐԵՎԱՆԻ ԴԱՍԱՎՈՐՈՒԹՅԱՄԲ)
-   ============================================================ */
-
-// ========== COLLISION ARRAYS ==========
-const buildings = [];
-const landmarks = [];
-
-// ========== COLORS ==========
-const buildingColors = [
-  0xd4a373, 0xccd5ae, 0xe9edc9, 0xfaedcd,
-  0xb08968, 0xa68a6d, 0xc9ada7, 0xe8d5b7,
-  0xd9bfa3, 0xc4a484, 0xbfa980, 0xe6d5b8
-];
-
-const roofColors = [0x8b5a3c, 0x6b4423, 0x7a5c3f, 0x5c4033];
-
-// ========== BUILDING FACTORY ==========
-function addBuilding(x, z, w, d, h) {
-  if (w <= 0 || d <= 0 || h <= 0) return;
-
-  const color = buildingColors[Math.floor(Math.random() * buildingColors.length)];
-  const roofColor = roofColors[Math.floor(Math.random() * roofColors.length)];
-
-  const body = new THREE.Mesh(
-    new THREE.BoxGeometry(w, h, d),
-    new THREE.MeshStandardMaterial({ color, roughness: 0.9 })
-  );
-  body.position.set(x, h / 2, z);
-  body.castShadow = true;
-  body.receiveShadow = true;
-  scene.add(body);
-
-  const roof = new THREE.Mesh(
-    new THREE.BoxGeometry(w + 0.6, 0.5, d + 0.6),
-    new THREE.MeshStandardMaterial({ color: roofColor, roughness: 0.85 })
-  );
-  roof.position.set(x, h + 0.25, z);
-  roof.castShadow = true;
-  scene.add(roof);
-
-  // Պատուհաններ
-  const winMat = new THREE.MeshStandardMaterial({
-    color: 0x88ccff, emissive: 0x224466, emissiveIntensity: 0.5,
-    roughness: 0.2, metalness: 0.3
-  });
-
-  const winW = 1.2, winH = 1.6, gapX = 2.8, gapY = 3.2;
-  const rows = Math.max(0, Math.floor((h - 2) / gapY));
-  const colsX = Math.max(0, Math.floor((w - 2) / gapX));
-  const colsZ = Math.max(0, Math.floor((d - 2) / gapX));
-
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < colsX; c++) {
-      const wx = x - w / 2 + 1.5 + c * gapX;
-      const wy = 2.5 + r * gapY;
-
-      const winF = new THREE.Mesh(new THREE.BoxGeometry(winW, winH, 0.1), winMat);
-      winF.position.set(wx, wy, z + d / 2 + 0.06);
-      scene.add(winF);
-
-      const winB = new THREE.Mesh(new THREE.BoxGeometry(winW, winH, 0.1), winMat);
-      winB.position.set(wx, wy, z - d / 2 - 0.06);
-      scene.add(winB);
-    }
-  }
-
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < colsZ; c++) {
-      const wz = z - d / 2 + 1.5 + c * gapX;
-      const wy = 2.5 + r * gapY;
-
-      const winL = new THREE.Mesh(new THREE.BoxGeometry(0.1, winH, winW), winMat);
-      winL.position.set(x - w / 2 - 0.06, wy, wz);
-      scene.add(winL);
-
-      const winR = new THREE.Mesh(new THREE.BoxGeometry(0.1, winH, winW), winMat);
-      winR.position.set(x + w / 2 + 0.06, wy, wz);
-      scene.add(winR);
-    }
-  }
-
-  buildings.push({
-    minX: x - w / 2, maxX: x + w / 2,
-    minZ: z - d / 2, maxZ: z + d / 2
-  });
-}
-
-// ============================================================
-// 1. ԿԱՍԿԱԴ (Cascades) — վերին աջ
-// ============================================================
-(function addCascade() {
-  const baseX = 40;
-  const baseZ = -60;
-  const steps = 6;
-  const stepMat = new THREE.MeshStandardMaterial({ color: 0xf5e6d3, roughness: 0.8 });
-  const railMat = new THREE.MeshStandardMaterial({ color: 0xd4c4a8, roughness: 0.7 });
-
-  for (let i = 0; i < steps; i++) {
-    const stepW = 20 - i * 2;
-    const stepH = 2.5;
-    const stepD = 3;
-
-    const step = new THREE.Mesh(
-      new THREE.BoxGeometry(stepW, stepH, stepD),
-      stepMat
-    );
-    step.position.set(baseX, stepH / 2 + i * stepH, baseZ + i * stepD);
-    step.castShadow = true;
-    step.receiveShadow = true;
-    scene.add(step);
-
-    landmarks.push({
-      minX: baseX - stepW / 2, maxX: baseX + stepW / 2,
-      minZ: baseZ + i * stepD - stepD / 2, maxZ: baseZ + i * stepD + stepD / 2
-    });
-
-    const railL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.2, stepD), railMat);
-    railL.position.set(baseX - stepW / 2 + 0.3, stepH + i * stepH + 0.6, baseZ + i * stepD);
-    railL.castShadow = true;
-    scene.add(railL);
-
-    const railR = railL.clone();
-    railR.position.x = baseX + stepW / 2 - 0.3;
-    scene.add(railR);
-  }
-
-  // Հուշարձան գագաթին
-  const monument = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.8, 1.2, 8, 8),
-    new THREE.MeshStandardMaterial({ color: 0xc4a484 })
-  );
-  monument.position.set(baseX, 23, baseZ + 15);
-  monument.castShadow = true;
-  scene.add(monument);
-})();
-
-// ============================================================
-// 2. ՄԱՏԵՆԱԴԱՐԱՆ — վերին ձախ
-// ============================================================
-(function addMatenadaran() {
-  const x = -60;
-  const z = -50;
-
-  const base = new THREE.Mesh(
-    new THREE.BoxGeometry(20, 10, 16),
-    new THREE.MeshStandardMaterial({ color: 0xd9bfa3, roughness: 0.85 })
-  );
-  base.position.set(x, 5, z);
-  base.castShadow = true;
-  base.receiveShadow = true;
-  scene.add(base);
-
-  // Սյուներ
-  const colMat = new THREE.MeshStandardMaterial({ color: 0xf5e6d3, roughness: 0.7 });
-  for (let i = 0; i < 6; i++) {
-    const col = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.6, 0.6, 9, 12),
-      colMat
-    );
-    col.position.set(x - 8 + i * 3.2, 4.5, z + 9);
-    col.castShadow = true;
-    scene.add(col);
-  }
-
-  // Աստիճաններ
-  for (let i = 0; i < 4; i++) {
-    const step = new THREE.Mesh(
-      new THREE.BoxGeometry(20, 0.4, 1),
-      new THREE.MeshStandardMaterial({ color: 0xcccccc })
-    );
-    step.position.set(x, 0.2 + i * 0.4, z + 10 + i);
-    scene.add(step);
-  }
-
-  landmarks.push({
-    minX: x - 10, maxX: x + 10,
-    minZ: z - 8, maxZ: z + 10
-  });
-})();
-
-// ============================================================
-// 3. ՕՊԵՐԱ (Opera House) — ձախ
-// ============================================================
-(function addOpera() {
-  const x = -40;
-  const z = -10;
-
-  const base = new THREE.Mesh(
-    new THREE.CylinderGeometry(12, 12, 4, 32),
-    new THREE.MeshStandardMaterial({ color: 0xe8d5b7, roughness: 0.8 })
-  );
-  base.position.set(x, 2, z);
-  base.castShadow = true;
-  base.receiveShadow = true;
-  scene.add(base);
-
-  const dome = new THREE.Mesh(
-    new THREE.SphereGeometry(12, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2),
-    new THREE.MeshStandardMaterial({ color: 0xc4a484, roughness: 0.7 })
-  );
-  dome.position.set(x, 4, z);
-  dome.castShadow = true;
-  scene.add(dome);
-
-  // Մուտքի կամար
-  const arch = new THREE.Mesh(
-    new THREE.BoxGeometry(6, 8, 2),
-    new THREE.MeshStandardMaterial({ color: 0xf5e6d3 })
-  );
-  arch.position.set(x, 4, z + 12);
-  scene.add(arch);
-
-  landmarks.push({
-    minX: x - 12, maxX: x + 12,
-    minZ: z - 12, maxZ: z + 12
-  });
-})();
-
-// ============================================================
-// 4. ՀԱՆՐԱՊԵՏՈՒԹՅԱՆ ՀՐԱՊԱՐԱԿ — կենտրոն
-// ============================================================
-(function addRepublicSquare() {
-  const x = 0, z = 0;
-
-  // Հրապարակի հատակ
-  const plaza = new THREE.Mesh(
-    new THREE.BoxGeometry(60, 0.2, 60),
-    new THREE.MeshStandardMaterial({ color: 0xd4c4a8 })
-  );
-  plaza.position.set(x, 0.1, z);
-  plaza.receiveShadow = true;
-  scene.add(plaza);
-
-  // Շատրվան
-  const fountainBase = new THREE.Mesh(
-    new THREE.CylinderGeometry(8, 8, 0.8, 32),
-    new THREE.MeshStandardMaterial({ color: 0xcccccc })
-  );
-  fountainBase.position.set(x, 0.5, z);
-  fountainBase.receiveShadow = true;
-  scene.add(fountainBase);
-
-  const water = new THREE.Mesh(
-    new THREE.CylinderGeometry(7.5, 7.5, 0.2, 32),
-    new THREE.MeshStandardMaterial({
-      color: 0x4facfe, transparent: true, opacity: 0.7, roughness: 0.1
-    })
-  );
-  water.position.set(x, 0.9, z);
-  scene.add(water);
-
-  const pillar = new THREE.Mesh(
-    new THREE.CylinderGeometry(1, 1.5, 4, 16),
-    new THREE.MeshStandardMaterial({ color: 0xdddddd })
-  );
-  pillar.position.set(x, 3, z);
-  pillar.castShadow = true;
-  scene.add(pillar);
-
-  const top = new THREE.Mesh(
-    new THREE.SphereGeometry(1.2, 16, 16),
-    new THREE.MeshStandardMaterial({ color: 0xffd166, metalness: 0.8 })
-  );
-  top.position.set(x, 5.5, z);
-  scene.add(top);
-
-  // Շենքեր հրապարակի շուրջ
-  addBuilding(-20, -20, 14, 14, 18);
-  addBuilding(20, -20, 14, 14, 18);
-  addBuilding(-20, 20, 14, 14, 18);
-  addBuilding(20, 20, 14, 14, 18);
-})();
-
-// ============================================================
-// 5. ԱԶԳԱՅԻՆ ՊԱՏԿԵՐԱՍՐԱՀ — ձախ
-// ============================================================
-(function addGallery() {
-  const x = -50;
-  const z = 20;
-
-  const base = new THREE.Mesh(
-    new THREE.BoxGeometry(22, 12, 16),
-    new THREE.MeshStandardMaterial({ color: 0xd4a373, roughness: 0.85 })
-  );
-  base.position.set(x, 6, z);
-  base.castShadow = true;
-  base.receiveShadow = true;
-  scene.add(base);
-
-  // Սյուներ
-  const colMat = new THREE.MeshStandardMaterial({ color: 0xf5e6d3 });
-  for (let i = 0; i < 4; i++) {
-    const col = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.7, 0.7, 11, 12),
-      colMat
-    );
-    col.position.set(x - 6 + i * 4, 5.5, z + 8);
-    scene.add(col);
-  }
-
-  // Տանիք
-  const roof = new THREE.Mesh(
-    new THREE.BoxGeometry(23, 0.8, 17),
-    new THREE.MeshStandardMaterial({ color: 0x8b5a3c })
-  );
-  roof.position.set(x, 12.5, z);
-  scene.add(roof);
-
-  landmarks.push({
-    minX: x - 11, maxX: x + 11,
-    minZ: z - 8, maxZ: z + 8
-  });
-})();
-
-// ============================================================
-// 6. MARRIOTT HOTEL — ներքև
-// ============================================================
-(function addMarriott() {
-  const x = 0;
-  const z = 50;
-
-  const base = new THREE.Mesh(
-    new THREE.BoxGeometry(30, 25, 20),
-    new THREE.MeshStandardMaterial({ color: 0xe8d5b7, roughness: 0.85 })
-  );
-  base.position.set(x, 12.5, z);
-  base.castShadow = true;
-  base.receiveShadow = true;
-  scene.add(base);
-
-  // Տանիք
-  const roof = new THREE.Mesh(
-    new THREE.BoxGeometry(31, 1, 21),
-    new THREE.MeshStandardMaterial({ color: 0x8b5a3c })
-  );
-  roof.position.set(x, 25.5, z);
-  scene.add(roof);
-
-  // Մուտք
-  const entrance = new THREE.Mesh(
-    new THREE.BoxGeometry(6, 6, 0.5),
-    new THREE.MeshStandardMaterial({ color: 0x4a90e2 })
-  );
-  entrance.position.set(x, 3, z - 10.5);
-  scene.add(entrance);
-
-  // Հովանոց
-  const canopy = new THREE.Mesh(
-    new THREE.BoxGeometry(12, 0.5, 4),
-    new THREE.MeshStandardMaterial({ color: 0xffd166 })
-  );
-  canopy.position.set(x, 6.5, z - 12);
-  scene.add(canopy);
-
-  landmarks.push({
-    minX: x - 15, maxX: x + 15,
-    minZ: z - 10, maxZ: z + 10
-  });
-})();
-
-// ============================================================
-// 7. ՀԱՄԱԼՍԱՐԱՆ — ներքև աջ
-// ============================================================
-(function addUniversity() {
-  const x = 50;
-  const z = 50;
-
-  const base = new THREE.Mesh(
-    new THREE.BoxGeometry(28, 18, 22),
-    new THREE.MeshStandardMaterial({ color: 0xf5e6d3, roughness: 0.85 })
-  );
-  base.position.set(x, 9, z);
-  base.castShadow = true;
-  base.receiveShadow = true;
-  scene.add(base);
-
-  // Սյուներ
-  const colMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
-  for (let i = 0; i < 6; i++) {
-    const col = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.6, 0.7, 17, 12),
-      colMat
-    );
-    col.position.set(x - 10 + i * 4, 8.5, z + 12);
-    col.castShadow = true;
-    scene.add(col);
-  }
-
-  // Աստիճաններ
-  for (let i = 0; i < 5; i++) {
-    const step = new THREE.Mesh(
-      new THREE.BoxGeometry(28, 0.4, 1),
-      new THREE.MeshStandardMaterial({ color: 0xcccccc })
-    );
-    step.position.set(x, 0.2 + i * 0.4, z + 13 + i);
-    scene.add(step);
-  }
-
-  // Հետևի մուտք
-  const backDoor = new THREE.Mesh(
-    new THREE.BoxGeometry(2, 3, 0.3),
-    new THREE.MeshStandardMaterial({ color: 0x6b4423 })
-  );
-  backDoor.position.set(x + 12, 1.5, z - 11.2);
-  scene.add(backDoor);
-
-  // Դրոշ
-  const flagPole = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.1, 0.1, 10, 8),
-    new THREE.MeshStandardMaterial({ color: 0x888888 })
-  );
-  flagPole.position.set(x, 5, z + 12);
-  scene.add(flagPole);
-
-  landmarks.push({
-    minX: x - 14, maxX: x + 14,
-    minZ: z - 11, maxZ: z + 11
-  });
-})();
-
-// ============================================================
-// 8. ՀՅՈՒՍԻՍԱՅԻՆ ՊՈՂՈՏԱ — աջ
-// ============================================================
-(function addNorthernAvenue() {
-  const x = 30;
-  const z = -10;
-
-  // Շենքեր երկու կողմից
-  for (let i = 0; i < 8; i++) {
-    const bz = z - 30 + i * 8;
-    addBuilding(x - 6, bz, 8, 6, 10 + Math.random() * 5);
-    addBuilding(x + 6, bz, 8, 6, 10 + Math.random() * 5);
-  }
-
-  // Փողոցի հատակ
-  const road = new THREE.Mesh(
-    new THREE.BoxGeometry(8, 0.05, 70),
-    new THREE.MeshStandardMaterial({ color: 0x3a3a3a })
-  );
-  road.position.set(x, 0.03, z);
-  road.receiveShadow = true;
-  scene.add(road);
-})();
-
-// ============================================================
-// ՀԵՏԻՆ ՓՈՂՈՑՆԵՐ (միացնող)
-// ============================================================
-
-// Կենտրոնական հորիզոնական պողոտա (Աբովյան)
-(function addMainAvenue() {
-  const road = new THREE.Mesh(
-    new THREE.BoxGeometry(200, 0.05, 14),
-    new THREE.MeshStandardMaterial({ color: 0x353535 })
-  );
-  road.position.set(0, 0.03, -5);
-  road.receiveShadow = true;
-  scene.add(road);
-
-  // Կենտրոնական գիծ
-  for (let i = -80; i < 80; i += 8) {
-    const dash = new THREE.Mesh(
-      new THREE.BoxGeometry(3, 0.06, 0.2),
-      new THREE.MeshStandardMaterial({ color: 0xffdd55, emissive: 0x443300 })
-    );
-    dash.position.set(i, 0.06, -5);
-    scene.add(dash);
-  }
-})();
-
-// Ուղղահայաց կենտրոնական (Մաշտոցի)
-(function addMashtotsAvenue() {
-  const road = new THREE.Mesh(
-    new THREE.BoxGeometry(14, 0.05, 200),
-    new THREE.MeshStandardMaterial({ color: 0x353535 })
-  );
-  road.position.set(0, 0.03, 20);
-  road.receiveShadow = true;
-  scene.add(road);
-
-  for (let i = -80; i < 80; i += 8) {
-    const dash = new THREE.Mesh(
-      new THREE.BoxGeometry(0.2, 0.06, 3),
-      new THREE.MeshStandardMaterial({ color: 0xffdd55, emissive: 0x443300 })
-    );
-    dash.position.set(0, 0.06, i + 20);
-    scene.add(dash);
-  }
-})();
-
-// ============================================================
-// ԾԱՌԵՐ ԱՄԵՆ ՈՒՐ (decorative)
-// ============================================================
-function addTree(x, z) {
-  const trunk = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.3, 0.4, 3, 8),
-    new THREE.MeshStandardMaterial({ color: 0x8b5a2b })
-  );
-  trunk.position.set(x, 1.5, z);
-  trunk.castShadow = true;
-  scene.add(trunk);
-
-  const leaves = new THREE.Mesh(
-    new THREE.SphereGeometry(1.8, 8, 8),
-    new THREE.MeshStandardMaterial({ color: 0x2a7a3a })
-  );
-  leaves.position.set(x, 4, z);
-  leaves.castShadow = true;
-  scene.add(leaves);
-}
-
-// Ծառեր հրապարակի շուրջ
-for (let i = 0; i < 12; i++) {
-  const angle = (i / 12) * Math.PI * 2;
-  const tx = Math.cos(angle) * 32;
-  const tz = Math.sin(angle) * 32;
-  addTree(tx, tz);
-}
-
-// Ծառեր ուղիների երկայնքով
-for (let i = -80; i < 80; i += 15) {
-  addTree(i, -15);
-  addTree(i, 5);
-  addTree(-15, i + 20);
-  addTree(15, i + 20);
- }
 
 /* ============================================================
    ՄԱՍ 5 — SAMAKAT MODEL + INDIAN COURIER (ՎԵՐՋՆԱԿԱՆ)
@@ -2217,7 +2235,7 @@ function updateCamera(dt) {
 
   camDesiredLook.set(
     player.position.x + forwardX * CAM_LOOK_AHEAD,
-    player.position.y + 1.5,
+    player.position.y + 0.0,
     player.position.z + forwardZ * CAM_LOOK_AHEAD
   );
 
@@ -2840,6 +2858,7 @@ function gameLoop() {
   updateMissionDistance();
 
   renderer.render(scene, camera);
+  if (mapOpen) drawFullscreenMap();
 
   minimapAccumulator += dt;
   if (minimapAccumulator >= MINIMAP_INTERVAL) {
@@ -2925,6 +2944,8 @@ window.addEventListener('keydown', (e) => {
 // ========== INITIAL RENDER ==========
 placeCameraBehindPlayer();
 renderer.render(scene, camera);
+
+
 
 clock.start();
 gameLoop();
@@ -3182,6 +3203,9 @@ function handleLookEnd(e) {
       break;
     }
   }
+  // ⚠️ Վերականգնում ենք camera-ն սկզբնական դիրքի
+  cameraPitchOffset = 0;
+  cameraYawOffset = 0;
 }
 
 if (touchLookZone) {
@@ -3219,11 +3243,336 @@ window.addEventListener('mousemove', (e) => {
 window.addEventListener('mouseup', (e) => {
   if (e.button === 2) {
     mouseLookActive = false;
+    cameraPitchOffset = 0;
+    cameraYawOffset = 0;
+  }
+});
+window.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+});
+
+/* ============================================================
+   FULLSCREEN MAP (ՓՈՂՈՑՆԵՐԻ ՔԱՐՏԵԶ + STREETS LEGEND)
+   ============================================================ */
+
+const fullscreenMapEl = document.getElementById('fullscreenMap');
+const fullscreenMapCanvas = document.getElementById('fullscreenMapCanvas');
+const fullscreenCtx = fullscreenMapCanvas.getContext('2d');
+const closeMapBtn = document.getElementById('closeMapBtn');
+const minimapEl = document.getElementById('minimap');
+const streetsListEl = document.getElementById('streetsList');
+const streetInfoEl = document.getElementById('streetInfo');
+const streetInfoNameEl = document.getElementById('streetInfoName');
+const streetInfoPointsEl = document.getElementById('streetInfoPoints');
+
+var mapOpen = false;
+let mapScale = 1;
+let mapOffsetX = 0;
+let mapOffsetY = 0;
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let selectedStreetIndex = -1;
+
+const MAP_WORLD_SIZE = 2000;
+const MAP_WORLD_HALF = 1000;
+
+const STREET_COLORS = {
+  avenue: '#4facfe',
+  main: '#ffd166',
+  small: '#888888'
+};
+
+// ========== ԲԱՑԵԼ ՔԱՐՏԵԶԸ ==========
+function openFullscreenMap() {
+  if (mapOpen) return;
+  mapOpen = true;
+  fullscreenMapEl.classList.add('open');
+
+  const W = Math.floor(window.innerWidth * 0.5);
+  const H = window.innerHeight;
+
+  fullscreenMapCanvas.width = W;
+  fullscreenMapCanvas.height = H;
+
+  // Սկզբում մոտ 100մ շառավիղ
+  const radiusPixels = Math.min(W, H) * 0.45;
+  mapScale = radiusPixels / 100;
+
+  mapOffsetX = 0;
+  mapOffsetY = 0;
+
+  buildStreetsList();
+  drawFullscreenMap();
+}
+
+// ========== ՓԱԿԵԼ ՔԱՐՏԵԶԸ ==========
+function closeFullscreenMap() {
+  mapOpen = false;
+  fullscreenMapEl.classList.remove('open');
+}
+
+// ========== ԿԱՌՈՒՑԵԼ ՓՈՂՈՑՆԵՐԻ ՑԱՆԿԸ ==========
+function buildStreetsList() {
+  streetsListEl.innerHTML = '';
+
+  if (typeof STREETS === 'undefined') {
+    streetsListEl.innerHTML = '<div style="color:#f55">STREETS չկա</div>';
+    return;
+  }
+
+  STREETS.forEach((street, index) => {
+    const item = document.createElement('div');
+    item.className = `streetItem type-${street.type}`;
+    item.dataset.index = index;
+
+    item.innerHTML = `
+      <div>
+        <div class="streetName">${index + 1}. ${street.name}</div>
+        <div class="streetType">${street.type} • ${street.width}մ</div>
+      </div>
+    `;
+
+    item.addEventListener('click', () => {
+      selectedStreetIndex = index;
+      document.querySelectorAll('.streetItem').forEach(el => el.classList.remove('selected'));
+      item.classList.add('selected');
+      showStreetInfo(index);
+      drawFullscreenMap();
+    });
+
+    streetsListEl.appendChild(item);
+  });
+}
+
+// ========== ՑՈՒՅՑ ՏԱԼ ՓՈՂՈՑԻ ԻՆՖՈՐՄԱՑԻԱՆ ==========
+function showStreetInfo(index) {
+  const street = STREETS[index];
+  streetInfoNameEl.textContent = `${index + 1}. ${street.name}`;
+  streetInfoPointsEl.innerHTML = '';
+
+  street.points.forEach((p, i) => {
+    const pointEl = document.createElement('div');
+    pointEl.className = 'pointItem';
+    pointEl.innerHTML = `
+      <span class="pointIndex">#${i + 1}</span>
+      x: <strong>${p.x}</strong>, z: <strong>${p.z}</strong>
+    `;
+    streetInfoPointsEl.appendChild(pointEl);
+  });
+}
+
+// ========== ԳԾԵԼ ՔԱՐՏԵԶԸ ==========
+function drawFullscreenMap() {
+  if (!mapOpen) return;
+
+  const ctx = fullscreenCtx;
+  const W = fullscreenMapCanvas.width;
+  const H = fullscreenMapCanvas.height;
+  const centerX = W / 2;
+  const centerY = H / 2;
+
+  // Թափանցիկ ֆոն
+  ctx.clearRect(0, 0, W, H);
+
+  // ՄԵՔԵՆԱՅԻ ՈՒՂՂՈՒԹՅՈՒՆԸ ՄԻՇՏ ՎԵՐԵՎ
+   const mapHeading = playerState.heading;
+
+  const px = player.position.x;
+  const pz = player.position.z;
+
+  function worldToMap(wx, wz) {
+    const dx = wx - px;
+    const dz = wz - pz;
+    const cos = Math.cos(mapHeading);
+    const sin = Math.sin(mapHeading);
+    const rx = dx * cos - dz * sin;
+    const rz = dx * sin + dz * cos;
+    return {
+      x: centerX - rx * mapScale,
+      y: centerY - rz * mapScale
+    };
+  }
+
+  // 100մ շառավղով շրջանակ
+  const radiusPixels = Math.min(W, H) * 0.45;
+
+  // Կիսաթափանցիկ ֆոն շրջանակի մեջ
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radiusPixels, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(15, 15, 30, 0.55)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 209, 102, 0.6)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Clip
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radiusPixels, 0, Math.PI * 2);
+  ctx.clip();
+
+  // ՓՈՂՈՑՆԵՐԸ
+  if (typeof STREETS !== 'undefined') {
+    STREETS.forEach(street => {
+      if (street.points.length < 2) return;
+
+      ctx.strokeStyle = street.type === 'avenue' ? '#4facfe'
+        : street.type === 'main' ? '#ffd166'
+        : '#888';
+      ctx.lineWidth = street.type === 'avenue' ? 5
+        : street.type === 'main' ? 3.5
+        : 2;
+      ctx.lineCap = 'round';
+
+      ctx.beginPath();
+      const first = worldToMap(street.points[0].x, street.points[0].z);
+      ctx.moveTo(first.x, first.y);
+
+      for (let i = 1; i < street.points.length; i++) {
+        const p = worldToMap(street.points[i].x, street.points[i].z);
+        ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+    });
+  }
+
+  // ՇԵՆՔԵՐԸ
+  if (typeof buildings !== 'undefined') {
+    ctx.fillStyle = 'rgba(138, 122, 90, 0.7)';
+    buildings.forEach(b => {
+      const p1 = worldToMap(b.minX, b.minZ);
+      const p2 = worldToMap(b.maxX, b.maxZ);
+      ctx.fillRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+    });
+  }
+
+  // LANDMARKS
+  if (typeof landmarks !== 'undefined') {
+    ctx.fillStyle = 'rgba(255, 209, 102, 0.6)';
+    landmarks.forEach(b => {
+      const p1 = worldToMap(b.minX, b.minZ);
+      const p2 = worldToMap(b.maxX, b.maxZ);
+      ctx.fillRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+    });
+  }
+
+  // MISSION MARKERS
+  if (typeof missionState !== 'undefined') {
+    if (missionState.phase === 'pickup' && missionState.pickupPoint) {
+      const p = worldToMap(missionState.pickupPoint.x, missionState.pickupPoint.z);
+      drawMarkerDot(ctx, p.x, p.y, '#4facfe', 8);
+    }
+    if (missionState.phase === 'deliver' && missionState.deliverPoint) {
+      const p = worldToMap(missionState.deliverPoint.x, missionState.deliverPoint.z);
+      drawMarkerDot(ctx, p.x, p.y, '#f5576c', 8);
+    }
+  }
+
+  ctx.restore();
+
+  // ՄԵՔԵՆԱՅԻ ՍԼԱՔԸ (կենտրոնում, վերև)
+  ctx.save();
+  ctx.translate(centerX, centerY);
+
+  ctx.fillStyle = '#ffd166';
+  ctx.beginPath();
+  ctx.moveTo(0, -14);
+  ctx.lineTo(-9, 9);
+  ctx.lineTo(0, 5);
+  ctx.lineTo(9, 9);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+
+  // ՀՈՒՇՈՒՄՆԵՐ
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText('🖱️ Scroll՝ zoom | ESC՝ փակել', W / 2, 15);
+}
+
+// ========== EVENTS ==========
+if (minimapEl) {
+  minimapEl.addEventListener('click', openFullscreenMap);
+}
+
+if (closeMapBtn) {
+  closeMapBtn.addEventListener('click', closeFullscreenMap);
+}
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && mapOpen) {
+    closeFullscreenMap();
   }
 });
 
-window.addEventListener('contextmenu', (e) => {
+fullscreenMapEl.addEventListener('mousedown', (e) => {
+  if (e.target === closeMapBtn) return;
+  if (e.target.closest('#streetsLegend') || e.target.closest('#streetInfo')) return;
+  isDragging = true;
+  fullscreenMapEl.classList.add('dragging');
+  dragStartX = e.clientX - mapOffsetX;
+  dragStartY = e.clientY - mapOffsetY;
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  mapOffsetX = e.clientX - dragStartX;
+  mapOffsetY = e.clientY - dragStartY;
+  drawFullscreenMap();
+});
+
+window.addEventListener('mouseup', () => {
+  if (isDragging) {
+    isDragging = false;
+    fullscreenMapEl.classList.remove('dragging');
+  }
+});
+
+fullscreenMapEl.addEventListener('wheel', (e) => {
+  if (e.target.closest('#streetsLegend') || e.target.closest('#streetInfo')) return;
   e.preventDefault();
+  const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+  const newScale = mapScale * zoomFactor;
+  if (newScale > 0.1 && newScale < 5) {
+    mapScale = newScale;
+    drawFullscreenMap();
+  }
+}, { passive: false });
+
+// Touch
+let touchStartX = 0, touchStartY = 0, touchDragStartX = 0, touchDragStartY = 0;
+
+fullscreenMapEl.addEventListener('touchstart', (e) => {
+  if (e.target.closest('#streetsLegend') || e.target.closest('#streetInfo')) return;
+  const touch = e.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  touchDragStartX = mapOffsetX;
+  touchDragStartY = mapOffsetY;
+}, { passive: false });
+
+fullscreenMapEl.addEventListener('touchmove', (e) => {
+  if (e.target.closest('#streetsLegend') || e.target.closest('#streetInfo')) return;
+  e.preventDefault();
+  const touch = e.touches[0];
+  mapOffsetX = touchDragStartX + (touch.clientX - touchStartX);
+  mapOffsetY = touchDragStartY + (touch.clientY - touchStartY);
+  drawFullscreenMap();
+}, { passive: false });
+
+window.addEventListener('resize', () => {
+  if (mapOpen) {
+    fullscreenMapCanvas.width = window.innerWidth;
+    fullscreenMapCanvas.height = window.innerHeight;
+    drawFullscreenMap();
+  }
 });
 /* ============================================================
    ՎԵՐՋ 🎉
